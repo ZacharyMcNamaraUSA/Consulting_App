@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="400.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View_Controller.UserLoginMainController">
+   <children>
+      <MenuBar VBox.vgrow="NEVER">
+         <menus>
+            <Menu fx:id="fileMenu" mnemonicParsing="false" text="File">
+               <items>
+                  <MenuItem fx:id="fileMenuNew" mnemonicParsing="false" text="New" />
+                  <MenuItem fx:id="fileMenuOpen" mnemonicParsing="false" text="Open…" />
+                  <Menu fx:id="fileMenuOpenRecent" mnemonicParsing="false" text="Open Recent" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="fileMenuClose" mnemonicParsing="false" text="Close" />
+                  <MenuItem fx:id="fileMenuSave" mnemonicParsing="false" text="Save" />
+                  <MenuItem fx:id="fileMenuSaveAs" mnemonicParsing="false" text="Save As…" />
+                  <MenuItem fx:id="fileMenuRevert" mnemonicParsing="false" text="Revert" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="fileMenuPreferences" mnemonicParsing="false" text="Preferences…" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="fileMenuQuit" mnemonicParsing="false" text="Quit" />
+               </items>
+            </Menu>
+            <Menu fx:id="editMenu" mnemonicParsing="false" text="Edit">
+               <items>
+                  <MenuItem fx:id="editMenuUndo" mnemonicParsing="false" text="Undo" />
+                  <MenuItem fx:id="editMenuRedo" mnemonicParsing="false" text="Redo" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="editMenuCut" mnemonicParsing="false" text="Cut" />
+                  <MenuItem fx:id="editMenuCopy" mnemonicParsing="false" text="Copy" />
+                  <MenuItem fx:id="editMenuPaste" mnemonicParsing="false" text="Paste" />
+                  <MenuItem fx:id="editMenuDelete" mnemonicParsing="false" text="Delete" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="editMenuSelectAll" mnemonicParsing="false" text="Select All" />
+                  <MenuItem fx:id="editMenuUnselectAll" mnemonicParsing="false" text="Unselect All" />
+               </items>
+            </Menu>
+            <Menu fx:id="editMenuHelp" mnemonicParsing="false" text="Help">
+               <items>
+                  <MenuItem fx:id="editMenuAbout" mnemonicParsing="false" text="About" />
+               </items>
+            </Menu>
+         </menus>
+      </MenuBar>
+      <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+         <children>
+            <Label fx:id="loginUserNameLabel" alignment="BASELINE_RIGHT" layoutX="41.0" layoutY="137.0" prefHeight="30.0" prefWidth="178.0" style="&#10;" text="Username" textAlignment="RIGHT" textFill="#9f9f9f" wrapText="false">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <ChoiceBox fx:id="loginUserNameChoiceBox" layoutX="230.0" layoutY="139.0" prefWidth="150.0" />
+            <Label fx:id="loginPasswordLabel" alignment="BASELINE_RIGHT" layoutX="41.0" layoutY="187.0" prefHeight="30.0" prefWidth="178.0" style="&#10;" text="Password" textAlignment="RIGHT" textFill="#9f9f9f" wrapText="false">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <PasswordField fx:id="loginPasswordField" layoutX="231.0" layoutY="189.0" />
+            <Button fx:id="loginEnterButton" defaultButton="true" layoutX="398.0" layoutY="189.0" mnemonicParsing="false" onAction="#initiateUserLogin" text="Login" />
+         </children>
+      </AnchorPane>
+      <HBox id="HBox" alignment="CENTER_LEFT" prefHeight="57.0" prefWidth="640.0" spacing="5.0" visible="true">
+         <children>
+            <Label fx:id="userLoginTimeLabel" alignment="BOTTOM_LEFT" maxHeight="1.7976931348623157E308" maxWidth="-1.0" prefHeight="51.0" prefWidth="224.0" text="Time: " wrapText="true" HBox.hgrow="ALWAYS">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="userLoginDateLabel" alignment="BOTTOM_LEFT" layoutX="13.0" layoutY="13.0" maxHeight="1.7976931348623157E308" maxWidth="-1.0" prefHeight="51.0" prefWidth="221.0" text="Date" wrapText="true">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="userLoginLocationLabel" alignment="BOTTOM_RIGHT" maxWidth="-1.0" prefHeight="51.0" prefWidth="173.0" text="Location:" HBox.hgrow="NEVER">
+               <font>
+                  <Font size="16.0" />
+               </font></Label>
+         </children>
+         <padding>
+            <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+         </padding>
+      </HBox>
+   </children>
+</VBox>

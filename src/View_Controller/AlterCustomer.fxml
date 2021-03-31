@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View_Controller.AlterCustomerController">
+   <children>
+      <VBox prefHeight="800.0" prefWidth="1000.0">
+         <children>
+            <MenuBar prefHeight="30.0" prefWidth="1000.0">
+               <menus>
+                  <Menu fx:id="fileMenu" mnemonicParsing="false" text="File">
+                     <items>
+                        <MenuItem fx:id="fileMenuNew" mnemonicParsing="false" text="New" />
+                        <MenuItem fx:id="fileMenuOpen" mnemonicParsing="false" text="Open…" />
+                        <Menu fx:id="fileMenuOpenRecent" mnemonicParsing="false" text="Open Recent" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem fx:id="fileMenuClose" mnemonicParsing="false" text="Close" />
+                        <MenuItem fx:id="fileMenuSave" mnemonicParsing="false" text="Save" />
+                        <MenuItem fx:id="fileMenuSaveAs" mnemonicParsing="false" text="Save As…" />
+                        <MenuItem fx:id="fileMenuRevert" mnemonicParsing="false" text="Revert" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem fx:id="fileMenuPreferences" mnemonicParsing="false" text="Preferences…" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem fx:id="fileMenuQuit" mnemonicParsing="false" text="Quit" />
+                     </items>
+                  </Menu>
+                  <Menu fx:id="editMenu" mnemonicParsing="false" text="Edit">
+                     <items>
+                        <MenuItem fx:id="editMenuUndo" mnemonicParsing="false" text="Undo" />
+                        <MenuItem fx:id="editMenuRedo" mnemonicParsing="false" text="Redo" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem fx:id="editMenuCut" mnemonicParsing="false" text="Cut" />
+                        <MenuItem fx:id="editMenuCopy" mnemonicParsing="false" text="Copy" />
+                        <MenuItem fx:id="editMenuPaste" mnemonicParsing="false" text="Paste" />
+                        <MenuItem fx:id="editMenuDelete" mnemonicParsing="false" text="Delete" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem fx:id="editMenuSelectAll" mnemonicParsing="false" text="Select All" />
+                        <MenuItem fx:id="editMenuUnselectAll" mnemonicParsing="false" text="Unselect All" />
+                     </items>
+                  </Menu>
+                  <Menu fx:id="editMenuHelp" mnemonicParsing="false" text="Help">
+                     <items>
+                        <MenuItem fx:id="editMenuAbout" mnemonicParsing="false" text="About" />
+                     </items>
+                  </Menu>
+               </menus>
+            </MenuBar>
+            <Pane prefHeight="795.0" prefWidth="1000.0">
+               <children>
+                  <TableView layoutX="130.0" prefHeight="775.0" prefWidth="870.0" style="-fx-border-color: red;">
+                    <columns>
+                      <TableColumn fx:id="customercolumnName" minWidth="61.0" prefWidth="96.0" resizable="false" text="Customer Name" />
+                        <TableColumn fx:id="customercolumnID" minWidth="61.0" resizable="false" text="Customer ID" />
+                        <TableColumn fx:id="customercolumnAddress" minWidth="61.0" prefWidth="100.0" resizable="false" text="Address" />
+                        <TableColumn fx:id="customercolumnPostalCode" minWidth="61.0" prefWidth="96.0" resizable="false" text="Postal Code" />
+                        <TableColumn fx:id="customercolumnFirstDivision" minWidth="61.0" prefWidth="100.0" resizable="false" text="First Division" />
+                        <TableColumn fx:id="customercolumnCountry" minWidth="61.0" resizable="false" text="Country" />
+                        <TableColumn fx:id="customercolumnNextApptDate" minWidth="61.0" prefWidth="150.0" resizable="false" text="Next Appointment Date" />
+                        <TableColumn fx:id="customercolumn11111111" minWidth="61.0" prefWidth="167.0" resizable="false" text="&quot;" />
+                    </columns>
+                  </TableView>
+                  <ToolBar orientation="VERTICAL" prefHeight="776.0" prefWidth="130.0">
+                    <items>
+                      <Button mnemonicParsing="false" text="Button" />
+                        <Button mnemonicParsing="false" text="Button" />
+                        <Button mnemonicParsing="false" text="Button" />
+                        <Button mnemonicParsing="false" text="Button" />
+                    </items>
+                  </ToolBar>
+               </children>
+            </Pane>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
