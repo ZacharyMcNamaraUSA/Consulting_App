@@ -1,82 +1,116 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View_Controller.AlterCustomerController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="404.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View_Controller.CustomerAlterController">
    <children>
-      <VBox prefHeight="800.0" prefWidth="1000.0">
+      <MenuBar layoutX="-7.0" prefHeight="40.0" prefWidth="507.0">
+         <menus>
+            <Menu fx:id="fileMenu" mnemonicParsing="false" text="File">
+               <items>
+                  <MenuItem fx:id="fileMenuNew" mnemonicParsing="false" text="New" />
+                  <MenuItem fx:id="fileMenuOpen" mnemonicParsing="false" text="Open…" />
+                  <Menu fx:id="fileMenuOpenRecent" mnemonicParsing="false" text="Open Recent" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="fileMenuClose" mnemonicParsing="false" text="Close" />
+                  <MenuItem fx:id="fileMenuSave" mnemonicParsing="false" text="Save" />
+                  <MenuItem fx:id="fileMenuSaveAs" mnemonicParsing="false" text="Save As…" />
+                  <MenuItem fx:id="fileMenuRevert" mnemonicParsing="false" text="Revert" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="fileMenuPreferences" mnemonicParsing="false" text="Preferences…" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="fileMenuQuit" mnemonicParsing="false" text="Quit" />
+               </items>
+            </Menu>
+            <Menu fx:id="editMenu" mnemonicParsing="false" text="Edit">
+               <items>
+                  <MenuItem fx:id="editMenuUndo" mnemonicParsing="false" text="Undo" />
+                  <MenuItem fx:id="editMenuRedo" mnemonicParsing="false" text="Redo" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="editMenuCut" mnemonicParsing="false" text="Cut" />
+                  <MenuItem fx:id="editMenuCopy" mnemonicParsing="false" text="Copy" />
+                  <MenuItem fx:id="editMenuPaste" mnemonicParsing="false" text="Paste" />
+                  <MenuItem fx:id="editMenuDelete" mnemonicParsing="false" text="Delete" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="editMenuSelectAll" mnemonicParsing="false" text="Select All" />
+                  <MenuItem fx:id="editMenuUnselectAll" mnemonicParsing="false" text="Unselect All" />
+               </items>
+            </Menu>
+            <Menu fx:id="editMenuHelp" mnemonicParsing="false" text="Help">
+               <items>
+                  <MenuItem fx:id="editMenuAbout" mnemonicParsing="false" text="About" />
+               </items>
+            </Menu>
+         </menus>
+      </MenuBar>
+      <VBox layoutY="30.0" prefHeight="380.0" prefWidth="500.0">
          <children>
-            <MenuBar prefHeight="30.0" prefWidth="1000.0">
-               <menus>
-                  <Menu fx:id="fileMenu" mnemonicParsing="false" text="File">
-                     <items>
-                        <MenuItem fx:id="fileMenuNew" mnemonicParsing="false" text="New" />
-                        <MenuItem fx:id="fileMenuOpen" mnemonicParsing="false" text="Open…" />
-                        <Menu fx:id="fileMenuOpenRecent" mnemonicParsing="false" text="Open Recent" />
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem fx:id="fileMenuClose" mnemonicParsing="false" text="Close" />
-                        <MenuItem fx:id="fileMenuSave" mnemonicParsing="false" text="Save" />
-                        <MenuItem fx:id="fileMenuSaveAs" mnemonicParsing="false" text="Save As…" />
-                        <MenuItem fx:id="fileMenuRevert" mnemonicParsing="false" text="Revert" />
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem fx:id="fileMenuPreferences" mnemonicParsing="false" text="Preferences…" />
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem fx:id="fileMenuQuit" mnemonicParsing="false" text="Quit" />
-                     </items>
-                  </Menu>
-                  <Menu fx:id="editMenu" mnemonicParsing="false" text="Edit">
-                     <items>
-                        <MenuItem fx:id="editMenuUndo" mnemonicParsing="false" text="Undo" />
-                        <MenuItem fx:id="editMenuRedo" mnemonicParsing="false" text="Redo" />
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem fx:id="editMenuCut" mnemonicParsing="false" text="Cut" />
-                        <MenuItem fx:id="editMenuCopy" mnemonicParsing="false" text="Copy" />
-                        <MenuItem fx:id="editMenuPaste" mnemonicParsing="false" text="Paste" />
-                        <MenuItem fx:id="editMenuDelete" mnemonicParsing="false" text="Delete" />
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem fx:id="editMenuSelectAll" mnemonicParsing="false" text="Select All" />
-                        <MenuItem fx:id="editMenuUnselectAll" mnemonicParsing="false" text="Unselect All" />
-                     </items>
-                  </Menu>
-                  <Menu fx:id="editMenuHelp" mnemonicParsing="false" text="Help">
-                     <items>
-                        <MenuItem fx:id="editMenuAbout" mnemonicParsing="false" text="About" />
-                     </items>
-                  </Menu>
-               </menus>
-            </MenuBar>
-            <Pane prefHeight="795.0" prefWidth="1000.0">
+            <TextField fx:id="customerAppointmentText" editable="false" promptText="Remember, you can only delete a Customer if they have no Appointments." text="Remember, you can only delete a Customer if they have no Appointments." />
+            <ToolBar nodeOrientation="LEFT_TO_RIGHT" prefHeight="40.0" prefWidth="200.0">
+              <items>
+                  <Button fx:id="commitCustomerButton" mnemonicParsing="false" onAction="#commitCustomer" prefHeight="25.0" prefWidth="161.0" text="Add this Customer" />
+                  <Button layoutX="270.0" layoutY="13.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="30.0" text="spacer1" visible="false" />
+                  <Button fx:id="cancelButton" layoutX="10.0" layoutY="13.0" mnemonicParsing="false" onAction="#cancelOperations" prefHeight="25.0" prefWidth="98.0" text="Cancel" />
+                  <Button layoutX="140.0" layoutY="13.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="30.0" text="spacer2" visible="false" />
+                  <Button fx:id="deleteButton" layoutX="140.0" layoutY="13.0" mnemonicParsing="false" onAction="#initiateDeleteCustomer" prefHeight="25.0" prefWidth="140.0" text="Delete this Customer" />
+              </items>
+            </ToolBar>
+            <Pane prefHeight="302.0" prefWidth="500.0">
                <children>
-                  <TableView layoutX="130.0" prefHeight="775.0" prefWidth="870.0" style="-fx-border-color: red;">
-                    <columns>
-                      <TableColumn fx:id="customercolumnName" minWidth="61.0" prefWidth="96.0" resizable="false" text="Customer Name" />
-                        <TableColumn fx:id="customercolumnID" minWidth="61.0" resizable="false" text="Customer ID" />
-                        <TableColumn fx:id="customercolumnAddress" minWidth="61.0" prefWidth="100.0" resizable="false" text="Address" />
-                        <TableColumn fx:id="customercolumnPostalCode" minWidth="61.0" prefWidth="96.0" resizable="false" text="Postal Code" />
-                        <TableColumn fx:id="customercolumnFirstDivision" minWidth="61.0" prefWidth="100.0" resizable="false" text="First Division" />
-                        <TableColumn fx:id="customercolumnCountry" minWidth="61.0" resizable="false" text="Country" />
-                        <TableColumn fx:id="customercolumnNextApptDate" minWidth="61.0" prefWidth="150.0" resizable="false" text="Next Appointment Date" />
-                        <TableColumn fx:id="customercolumn11111111" minWidth="61.0" prefWidth="167.0" resizable="false" text="&quot;" />
-                    </columns>
-                  </TableView>
-                  <ToolBar orientation="VERTICAL" prefHeight="776.0" prefWidth="130.0">
-                    <items>
-                      <Button mnemonicParsing="false" text="Button" />
-                        <Button mnemonicParsing="false" text="Button" />
-                        <Button mnemonicParsing="false" text="Button" />
-                        <Button mnemonicParsing="false" text="Button" />
-                    </items>
-                  </ToolBar>
+                  <Label layoutX="35.0" layoutY="30.0" minWidth="100.0" text="Customer ID">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="35.0" layoutY="70.0" minWidth="100.0" text="Name">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="35.0" layoutY="110.0" minWidth="100.0" text="Street Address">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="35.0" layoutY="230.0" minWidth="100.0" text="Postal Code">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="35.0" layoutY="270.0" minWidth="100.0" text="Phone #">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="35.0" layoutY="150.0" prefWidth="100.0" text="Country">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="35.0" layoutY="190.0" text="First Level Division">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="customerIDText" disable="true" editable="true" layoutX="310.0" layoutY="30.0" prefWidth="150.0" promptText="Auto-generated" />
+                  <TextField fx:id="customerNameText" layoutX="310.0" layoutY="70.0" prefWidth="150.0" promptText="Enter a name" />
+                  <TextField fx:id="customerAddressText" layoutX="310.0" layoutY="110.0" prefWidth="150.0" promptText="Enter street address" />
+                  <ComboBox fx:id="countryComboBox" layoutX="310.0" layoutY="150.0" onAction="#userSelectedCountry" prefWidth="150.0" promptText="Select Country first" />
+                  <ComboBox fx:id="firstDivisionComboBox" layoutX="310.0" layoutY="190.0" prefWidth="150.0" promptText="then First Level Div." />
+                  <TextField fx:id="customerPostalCodeText" layoutX="310.0" layoutY="230.0" prefWidth="150.0" promptText="Enter Postal Code" />
+                  <TextField fx:id="customerPhoneText" layoutX="310.0" layoutY="270.0" prefWidth="150.0" promptText="Enter Phone #" />
                </children>
             </Pane>
          </children>
