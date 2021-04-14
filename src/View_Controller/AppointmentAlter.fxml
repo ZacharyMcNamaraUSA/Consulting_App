@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="498.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <MenuBar layoutX="-7.0" prefHeight="40.0" prefWidth="507.0">
+         <menus>
+            <Menu fx:id="fileMenu" mnemonicParsing="false" text="File">
+               <items>
+                  <MenuItem fx:id="fileMenuNew" mnemonicParsing="false" text="New" />
+                  <MenuItem fx:id="fileMenuOpen" mnemonicParsing="false" text="Open…" />
+                  <Menu fx:id="fileMenuOpenRecent" mnemonicParsing="false" text="Open Recent" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="fileMenuClose" mnemonicParsing="false" text="Close" />
+                  <MenuItem fx:id="fileMenuSave" mnemonicParsing="false" text="Save" />
+                  <MenuItem fx:id="fileMenuSaveAs" mnemonicParsing="false" text="Save As…" />
+                  <MenuItem fx:id="fileMenuRevert" mnemonicParsing="false" text="Revert" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="fileMenuPreferences" mnemonicParsing="false" text="Preferences…" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="fileMenuQuit" mnemonicParsing="false" text="Quit" />
+               </items>
+            </Menu>
+            <Menu fx:id="editMenu" mnemonicParsing="false" text="Edit">
+               <items>
+                  <MenuItem fx:id="editMenuUndo" mnemonicParsing="false" text="Undo" />
+                  <MenuItem fx:id="editMenuRedo" mnemonicParsing="false" text="Redo" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="editMenuCut" mnemonicParsing="false" text="Cut" />
+                  <MenuItem fx:id="editMenuCopy" mnemonicParsing="false" text="Copy" />
+                  <MenuItem fx:id="editMenuPaste" mnemonicParsing="false" text="Paste" />
+                  <MenuItem fx:id="editMenuDelete" mnemonicParsing="false" text="Delete" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="editMenuSelectAll" mnemonicParsing="false" text="Select All" />
+                  <MenuItem fx:id="editMenuUnselectAll" mnemonicParsing="false" text="Unselect All" />
+               </items>
+            </Menu>
+            <Menu fx:id="editMenuHelp" mnemonicParsing="false" text="Help">
+               <items>
+                  <MenuItem fx:id="editMenuAbout" mnemonicParsing="false" text="About" />
+               </items>
+            </Menu>
+         </menus>
+      </MenuBar>
+      <VBox layoutY="30.0" prefHeight="506.0" prefWidth="500.0">
+         <children>
+            <ToolBar nodeOrientation="LEFT_TO_RIGHT" prefHeight="40.0" prefWidth="200.0">
+               <items>
+                  <Button fx:id="commitAppointmentButton" defaultButton="true" mnemonicParsing="false" onAction="#commitAppointment" prefHeight="25.0" prefWidth="157.0" text="Add new Appointment" />
+                  <Button layoutX="270.0" layoutY="13.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="30.0" text="spacer1" visible="false" />
+                  <Button fx:id="cancelButton" cancelButton="true" layoutX="10.0" layoutY="13.0" mnemonicParsing="false" onAction="#cancelAppointmentAlter" prefHeight="25.0" prefWidth="70.0" text="Cancel" />
+                  <Button layoutX="140.0" layoutY="13.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="30.0" text="spacer2" visible="false" />
+                  <Button fx:id="deleteAppointmentButton" layoutX="140.0" layoutY="13.0" mnemonicParsing="false" onAction="#initiateDelete" prefHeight="25.0" prefWidth="154.0" text="Delete this Appointment" />
+               </items>
+            </ToolBar>
+            <Pane prefHeight="484.0" prefWidth="500.0">
+               <children>
+                  <Label layoutX="35.0" layoutY="30.0" minWidth="100.0" text="Appointment ID">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="35.0" layoutY="70.0" minWidth="100.0" text="Title">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="35.0" layoutY="110.0" minWidth="100.0" text="Description">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="date" layoutX="35.0" layoutY="230.0" minWidth="100.0" text="Date">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="35.0" layoutY="310.0" minWidth="100.0" text="End time">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="35.0" layoutY="350.0" minWidth="100.0" text="Customer ID">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="35.0" layoutY="390.0" minWidth="100.0" text="Contact Name">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="35.0" layoutY="150.0" prefWidth="100.0" text="Location">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="35.0" layoutY="430.0" minWidth="100.0" text="User ID">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="35.0" layoutY="190.0" text="Type">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="35.0" layoutY="270.0" minWidth="100.0" text="Start time">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="appointmentIDText" disable="true" editable="false" layoutX="310.0" layoutY="30.0" prefWidth="150.0" promptText="Auto-generated" />
+                  <TextField fx:id="titleText" layoutX="310.0" layoutY="70.0" prefWidth="150.0" promptText="Enter a name" />
+                  <TextField fx:id="descriptionText" layoutX="310.0" layoutY="110.0" prefWidth="150.0" promptText="Enter description" />
+                  <TextField fx:id="locationText" layoutX="310.0" layoutY="150.0" prefWidth="150.0" promptText="Enter location" />
+                  <TextField fx:id="typeText" layoutX="310.0" layoutY="190.0" prefWidth="150.0" promptText="Enter type" />
+                  <DatePicker fx:id="datePicker" layoutX="310.0" layoutY="230.0" prefHeight="25.0" prefWidth="150.0" promptText="Select appt. date" />
+                  <TextField fx:id="startTimeText" layoutX="310.0" layoutY="270.0" prefWidth="150.0" promptText="Use HH:mm:ss format" />
+                  <TextField fx:id="endTimeText" layoutX="310.0" layoutY="310.0" prefWidth="150.0" promptText="Use HH:mm:ss format" />
+                  <TextField fx:id="customerIDText" layoutX="310.0" layoutY="348.0" prefWidth="150.0" promptText="Enter Customer ID" />
+                  <ComboBox fx:id="contactComboBox" layoutX="310.0" layoutY="390.0" prefWidth="150.0" promptText="Select a Contact" />
+                  <TextField fx:id="userIDText" layoutX="310.0" layoutY="430.0" prefWidth="150.0" promptText="Enter User ID" />
+               </children>
+            </Pane>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
