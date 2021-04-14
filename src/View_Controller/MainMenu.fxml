@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane maxHeight="1000" maxWidth="10000" minHeight="200" minWidth="200" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View_Controller.MainMenuController">
    <children>
@@ -53,30 +57,59 @@
             </Menu>
          </menus>
       </MenuBar>
-      <ToolBar layoutY="760.0" prefHeight="40.0" prefWidth="1000.0">
+      <ToolBar layoutY="760.0" prefHeight="40.0" prefWidth="829.0">
         <items>
-          <Button mnemonicParsing="false" text="Refresh Appointments" />
-            <ToggleButton disable="true" mnemonicParsing="false" text="Spacer" />
-            <ToggleButton layoutX="149.0" layoutY="13.0" mnemonicParsing="false" text="View by Month" />
+            <Button fx:id="viewCustomersButton" defaultButton="true" mnemonicParsing="false" onAction="#viewAllCustomers" prefHeight="9.0" prefWidth="192.0" text="View all Customers" wrapText="true">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Button>
+            <ToggleButton mnemonicParsing="false" opacity="0.0" text="Spacer" visible="false">
+               <font>
+                  <Font size="1.0" />
+               </font></ToggleButton>
+            <ToggleButton fx:id="editAppointment" layoutX="149.0" layoutY="13.0" mnemonicParsing="false" onAction="#editSelectedAppointment" text="Edit this Appointment" />
+          <Button fx:id="addAppointmentButton" mnemonicParsing="false" onAction="#addNewAppointment" text="Add an Appointment" />
         </items>
       </ToolBar>
       <Pane layoutY="25.0" prefHeight="728.0" prefWidth="1200.0">
          <children>
-            <Pane prefHeight="337.0" prefWidth="200.0" />
-            <Pane layoutX="-3.0" layoutY="344.0" prefHeight="399.0" prefWidth="207.0" />
+            <Pane prefHeight="130.0" prefWidth="200.0">
+               <children>
+                  <RadioButton fx:id="weeklyCheckBox" layoutX="15.0" layoutY="65.0" mnemonicParsing="false" selected="true" text="Weekly" toggleGroup="$viewSwap">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                     <toggleGroup>
+                        <ToggleGroup fx:id="viewSwap" />
+                     </toggleGroup>
+                  </RadioButton>
+                  <RadioButton fx:id="monthlyRadioButton" layoutX="15.0" layoutY="95.0" mnemonicParsing="false" text="Monthly" toggleGroup="$viewSwap">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </RadioButton>
+                  <Label layoutX="15.0" layoutY="10.0" prefHeight="40.0" prefWidth="157.0" text="Appointments">
+                     <font>
+                        <Font name="Arial" size="24.0" />
+                     </font>
+                  </Label>
+               </children></Pane>
+            <Pane layoutY="138.0" prefHeight="605.0" prefWidth="200.0" />
             <Pane layoutX="200.0" prefHeight="735.0" prefWidth="1000.0">
                <children>
-                  <TableView fx:id="appointmentsTableView" editable="true" prefHeight="728.0" prefWidth="1000.0">
+                  <TableView fx:id="appointmentsTableView" editable="true" maxWidth="10000.0" prefHeight="735.0" prefWidth="1000.0">
                     <columns>
-                      <TableColumn fx:id="columnApptId" prefWidth="75.0" text="Appt ID" />
-                      <TableColumn fx:id="columnTitle" prefWidth="75.0" text="Title" />
-                        <TableColumn fx:id="columnDescription" prefWidth="75.0" text="Description" />
-                        <TableColumn fx:id="columnLocation" prefWidth="75.0" text="Location" />
-                        <TableColumn fx:id="columnType" prefWidth="75.0" text="Type" />
-                        <TableColumn fx:id="columnStartDateTime" prefWidth="75.0" text="Start" />
-                        <TableColumn fx:id="columnEndDateTime" prefWidth="75.0" text="End" />
-                        <TableColumn fx:id="columnCustomerID" prefWidth="75.0" text="Customer ID" />
-                        <TableColumn fx:id="columnContactID" prefWidth="75.0" text="Contact ID" />
+                      <TableColumn fx:id="columnApptId" prefWidth="80.0" text="Appt ID" />
+                      <TableColumn fx:id="columnTitle" prefWidth="90.0" text="Title" />
+                        <TableColumn fx:id="columnDescription" prefWidth="120.0" text="Description" />
+                        <TableColumn fx:id="columnLocation" prefWidth="145.0" text="Location" />
+                        <TableColumn fx:id="columnType" prefWidth="110.0" resizable="true" text="Type" />
+                        <TableColumn fx:id="columnStartDateTime" prefWidth="120.0" text="Start" />
+                        <TableColumn fx:id="columnEndDateTime" prefWidth="120.0" text="End" />
+                        <TableColumn fx:id="columnCustomerID" prefWidth="80.0" text="Customer ID" />
+                        <TableColumn fx:id="columnContactID" prefWidth="80.0" text="Contact ID" />
+                        <TableColumn fx:id="columnUserId" prefWidth="60.0" text="User ID" />
                     </columns>
                   </TableView>
                </children>
