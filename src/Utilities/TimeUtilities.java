@@ -1,40 +1,54 @@
 package Utilities;
 
-import java.sql.Timestamp;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 
 public class TimeUtilities {
 
    public static final ZoneId userZoneId = ZoneId.systemDefault();
-   public static final ZoneId zoneIdUTC = ZoneId.of("UTC");
-   Instant instantTest = Instant.now();
-   ZoneId zoneIdAmericaChicago = ZoneId.of("America/Chicago");
-   ZoneId zoneIdAmericaNewYork = ZoneId.of("America/NewYork");
-   ZoneId zoneIdEuropeLondon = ZoneId.of("Europe/London");
-   ZoneId zoneIdAmericaPhoenix = ZoneId.of("America/Phoenix");
-   ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(instantTest, zoneIdAmericaChicago);
-
+   public static final ZoneId homeOfficeZoneId = ZoneId.of("America/New_York");
+   public static String databaseDateTimeFormat = "uuuu-MM-dd HH:mm:ss";
+   public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(databaseDateTimeFormat);
+   public static final DateTimeFormatter timeFormatterLong = DateTimeFormatter.ofPattern("HH:mm:ss");
+   public static final DateTimeFormatter timeFormatterShort = DateTimeFormatter.ofPattern("HH:mm");
+   
+   private static final LocalTime businessHoursStart =  LocalTime.of(8, 0);
+   private static final LocalTime businessHoursEnd =  LocalTime.of(22, 0);
+   
+   private static final ZonedDateTime businessOpenZonedDateTime = ZonedDateTime.of(
+             LocalDate.now(homeOfficeZoneId),
+             businessHoursStart,
+             homeOfficeZoneId);
+   private static final ZonedDateTime businessCloseZonedDateTime = ZonedDateTime.of(
+             LocalDate.now(homeOfficeZoneId),
+             businessHoursEnd,
+             homeOfficeZoneId);
+   
+   public static final Instant businessOpen = businessOpenZonedDateTime.toInstant();
+   public static final Instant businessClosed = businessCloseZonedDateTime.toInstant();
+   
+   
+   /** Method tests if input ZonedDateTime is during business hours.
+    * @param instant Input Instant to be tested against business hours.
+    * @return Returns true if the input is between business hours or false if not.
+    */
+   public static boolean isDuringBusinessHours(Instant instant) {
+      
+      return instant.isBefore(businessClosed) && businessOpen.isBefore(instant);
+      
+   }
+   
 
    /**
     * Method receives a LocalDateTime and converts it to a ZonedDateTime with ZoneId.systemDefault()
     * @param dateTimeBegin LocalDateTime to convert
     * @return The ZonedDateTime calculated from system defaults.
     */
-   public static ZonedDateTime localDTtoZonedDT(LocalDateTime dateTimeBegin) {
-      ZonedDateTime zonedDateTime = dateTimeBegin.atZone(userZoneId);
+   public static ZonedDateTime convertDatabaseDTtoZonedDT(LocalDateTime dateTimeBegin) {
+      ZonedDateTime zonedDateTime = dateTimeBegin.atZone(ZoneOffset.UTC);
+      zonedDateTime.withZoneSameInstant(ZoneId.systemDefault());
 
       return zonedDateTime;
-   }
-
-
-   /**
-    * Method receives a LocalDateTime to be converted to an Instant
-    * @param ldt The input LocalDateTime Object
-    */
-   public static Instant localDTtoInstant(LocalDateTime ldt) {
-      ZonedDateTime zdt =  ldt.atZone(userZoneId);
-      return zdt.toInstant();
    }
 
    /**
@@ -42,36 +56,31 @@ public class TimeUtilities {
     * @param zdt The ZonedDateTime is the required input to be printed as a String.
     * @return Returns a String which prints the input ZonedDateTime.
     */
-   public static String convertZDTtoLDTString(ZonedDateTime zdt) {
+   public static String formatZDTAsDatabaseString(ZonedDateTime zdt) {
 
       LocalDateTime ldt = LocalDateTime.ofInstant(zdt.toInstant(), ZoneOffset.UTC);
-      String databaseString = ldt.format(DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm:ss"));
+      String databaseString = ldt.format(DateTimeFormatter.ofPattern(databaseDateTimeFormat));
 
       return databaseString;
    }
+   
 
-
-
-
-
-
-   /**
-    * Converts Date to Timestamp
-    * @param date Date to be converted to Timestamp, if not null.
-    * @return
-    */
-   public Timestamp convertDateToTimestamp(java.util.Date date) {
-      return date == null ? null : new java.sql.Timestamp(date.getTime());
-   } //getTimestamp
+   public static ZonedDateTime parseStringToZonedDateTime(String dateTime) {
+      LocalDateTime ldt = LocalDateTime.parse(dateTime, DateTimeFormatter.ofPattern(databaseDateTimeFormat));
+      ZonedDateTime zonedDateTime = ldt.atZone(ZoneId.of("Z"));
+      ZonedDateTime adjustedZonedDT =  zonedDateTime.withZoneSameInstant(userZoneId);
+      return adjustedZonedDT;
+   }
 
 
    /**
-    * Converts Instant to Timestamp
-    * @param instantParam The Instant to be converted to Timestamp, if not null.
-    * @return Retruns the converted SQL Timestamp.
+    * This method receives a ZonedDateTime which is returned as a formatted String.
+    * @param zdt The ZonedDateTime to be formatted.
+    * @return Returns a String of the formatted ZonedDateTime.
     */
-   public static Timestamp convertDateToTimestamp(Instant instantParam) {
-//      return (instantParam == null) ? null : new Timestamp.valueOf(instantParam);
-      return null;
-   } //getTimestamp
+   public static String formatZDTToString(ZonedDateTime zdt) {
+      return zdt.format(dateTimeFormatter);
+   }
+   
+
 }
