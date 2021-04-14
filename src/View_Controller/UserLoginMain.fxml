@@ -72,22 +72,27 @@
             <Button fx:id="loginEnterButton" defaultButton="true" layoutX="398.0" layoutY="189.0" mnemonicParsing="false" onAction="#initiateUserLogin" text="Login" />
          </children>
       </AnchorPane>
-      <HBox id="HBox" alignment="CENTER_LEFT" prefHeight="57.0" prefWidth="640.0" spacing="5.0" visible="true">
+      <HBox id="HBox" alignment="CENTER_LEFT" prefHeight="117.0" prefWidth="650.0" spacing="5.0" visible="true">
          <children>
-            <Label fx:id="userLoginTimeLabel" alignment="BOTTOM_LEFT" maxHeight="1.7976931348623157E308" maxWidth="-1.0" prefHeight="51.0" prefWidth="224.0" text="Time: " wrapText="true" HBox.hgrow="ALWAYS">
+            <VBox prefHeight="111.0" prefWidth="271.0">
+               <children>
+                  <Label fx:id="userLoginTimeLabel" alignment="BOTTOM_LEFT" maxHeight="1.7976931348623157E308" maxWidth="-1.0" prefHeight="51.0" prefWidth="262.0" text="Time: " wrapText="true">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="userLoginDateLabel" alignment="BOTTOM_LEFT" maxHeight="1.7976931348623157E308" maxWidth="-1.0" prefHeight="51.0" prefWidth="253.0" text="Date" wrapText="true">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <Label fx:id="userLoginLocationLabel" alignment="BOTTOM_RIGHT" maxWidth="-1.0" prefHeight="83.0" prefWidth="320.0" text="Location:">
                <font>
                   <Font size="16.0" />
                </font>
             </Label>
-            <Label fx:id="userLoginDateLabel" alignment="BOTTOM_LEFT" layoutX="13.0" layoutY="13.0" maxHeight="1.7976931348623157E308" maxWidth="-1.0" prefHeight="51.0" prefWidth="221.0" text="Date" wrapText="true">
-               <font>
-                  <Font size="16.0" />
-               </font>
-            </Label>
-            <Label fx:id="userLoginLocationLabel" alignment="BOTTOM_RIGHT" maxWidth="-1.0" prefHeight="51.0" prefWidth="173.0" text="Location:" HBox.hgrow="NEVER">
-               <font>
-                  <Font size="16.0" />
-               </font></Label>
          </children>
          <padding>
             <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
