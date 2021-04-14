@@ -1,7 +1,8 @@
 package View_Controller;
 
-import Database.DAO.UsersDaoImpl;
-import Database.Entities.Users;
+import Database.DAO.UserDaoImpl;
+import Database.Entities.User;
+import Utilities.TimeUtilities;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -12,7 +13,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import org.jetbrains.annotations.NotNull;
 import sample.Main;
 
@@ -119,9 +119,8 @@ public class UserLoginMainController implements Initializable {
 
 
    private final Locale userLocale = Locale.getDefault();
-   private UsersDaoImpl usersDaoImpl = new UsersDaoImpl();
+   private UserDaoImpl usersDaoImpl = new UserDaoImpl();
    private String colonSpacer = ": ";
-   private Exception SingleUsersNotFoundException = new NullPointerException();
    private String lineSpacer = " | ";
 
 
@@ -139,7 +138,9 @@ public class UserLoginMainController implements Initializable {
 
       // for testing purposes
       // TODO REMOVE AUTO-ENTERED PASSWORD
+      loginUserNameChoiceBox.setValue("test");
       loginPasswordField.setText("test");
+      
    }
 
 
@@ -157,30 +158,38 @@ public class UserLoginMainController implements Initializable {
       String enteredPassword = loginPasswordField.getText();
       String storedPassword = "";
       boolean successfulLogin = false;
-      Users loginUsers = null;
+      User loginUser = null;
 
       updateDateTime();
 
-      storedPassword = (usersDaoImpl.getSingleUsers(username)).getPassword();
-      System.out.println("Initiate login for user '" + username + "'!");
-      System.out.println("\tPassword entered = " + enteredPassword);
+      try {
+         storedPassword = (usersDaoImpl.getSingleUsers(username)).getPassword();
+      } catch (Exception e) {
+         loginFail();
+      }
+
+//      System.out.println("Initiate login for user '" + username + "'!");
+//      System.out.println("\tPassword entered = " + enteredPassword);
       System.out.println((storedPassword.equals(enteredPassword)) ? "\tPasswords match!" : "\tPasswords do not match.");
 
       if (enteredPassword.equals(storedPassword)) {
          successfulLogin = true;
-         loginUsers = usersDaoImpl.getSingleUsers(username);
+         loginUser = usersDaoImpl.getSingleUsers(username);
       }
       else {     //login failed
 
          loginFail();
       }
 
+      if(loginUser != null)
+         MainMenuController.initData(loginUser);
+      else
+         throw(new NullPointerException());
+
       recordLoginAttempt(successfulLogin, username);
 
       if (successfulLogin) {
          try {
-            // TODO LOGIN Successful! Create then call next Scene
-
                Stage primaryStage = Main.myStage;
 
                FXMLLoader loader = new FXMLLoader(getClass().getResource("/View_Controller/MainMenu.fxml"));
@@ -189,16 +198,9 @@ public class UserLoginMainController implements Initializable {
 //               loader.setController(mainMenuController);
                Parent root = loader.load();
                primaryStage.setScene(new Scene(root));
+               primaryStage.setResizable(false);
 
-               primaryStage.show();
-
-            if(loginUsers != null) {
-               MainMenuController mainMenuController = new MainMenuController();
-               mainMenuController.initData(loginUsers);
-            }
-            else
-               throw(SingleUsersNotFoundException);
-
+            primaryStage.show();
 
          } catch (NullPointerException e) {
             System.out.println(e.getMessage());
@@ -263,7 +265,7 @@ public class UserLoginMainController implements Initializable {
       updateDateTime();
 
       // Determine user country and set userLoginLocationLabel
-      String userLocation = System.getProperty("user.country");
+      String userLocation = TimeUtilities.userZoneId.toString();
       userLoginLocationLabel.setText(translateText("Location") + colonSpacer + userLocation) ;
 
       loginUserNameLabel.setText(translateText("Username"));
@@ -325,12 +327,11 @@ public class UserLoginMainController implements Initializable {
 
       ObservableList<String> allUserNames = FXCollections.observableArrayList();
 
-      for (Users users: usersDaoImpl.getAllUsers()) {
-         allUserNames.add(users.getUserName());
+      for (User user : usersDaoImpl.getAllUsers()) {
+         allUserNames.add(user.getUserName());
       }
 
       loginUserNameChoiceBox.setItems(allUserNames);
-      loginUserNameChoiceBox.getSelectionModel().select(0);
 
    } //populateUserNames
 
