@@ -3,7 +3,7 @@ package Database.Entities;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-public class Users {
+public class User {
    private int userId;
    private String userName;
    private String password;
@@ -13,8 +13,8 @@ public class Users {
    private Timestamp lastUpdate;
    private String lastUpdatedBy;
 
-   public Users(int userId, String userName, String password, Timestamp createDate,
-                String createdBy, Timestamp lastUpdate, String lastUpdatedBy) {
+   public User(int userId, String userName, String password, Timestamp createDate,
+               String createdBy, Timestamp lastUpdate, String lastUpdatedBy) {
       this.userId = userId;
       this.userName = userName;
       this.password = password;
