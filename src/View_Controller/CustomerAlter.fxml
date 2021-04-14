@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SeparatorMenuItem?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -18,8 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View_Controller.AlterCustomerController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="404.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View_Controller.CustomerAlterController">
    <children>
       <MenuBar layoutX="-7.0" prefHeight="40.0" prefWidth="507.0">
          <menus>
@@ -60,21 +55,20 @@
             </Menu>
          </menus>
       </MenuBar>
-      <VBox layoutY="30.0" prefHeight="670.0" prefWidth="500.0">
+      <VBox layoutY="30.0" prefHeight="380.0" prefWidth="500.0">
          <children>
-            <TextArea prefHeight="21.0" prefWidth="500.0" style="-fx-background-color: red; -fx-border-color: red;" styleClass="-fx-background-color" text="This represents whether the customer may be deleted. \nRemember, you must delete all customer appointments first!" wrapText="true" />
+            <TextField fx:id="customerAppointmentText" editable="false" promptText="Remember, you can only delete a Customer if they have no Appointments." text="Remember, you can only delete a Customer if they have no Appointments." />
             <ToolBar nodeOrientation="LEFT_TO_RIGHT" prefHeight="40.0" prefWidth="200.0">
               <items>
-                <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="126.0" text="Add new Customer" />
+                  <Button fx:id="commitCustomerButton" mnemonicParsing="false" onAction="#commitCustomer" prefHeight="25.0" prefWidth="161.0" text="Add this Customer" />
                   <Button layoutX="270.0" layoutY="13.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="30.0" text="spacer1" visible="false" />
-                  <Button layoutX="10.0" layoutY="13.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="126.0" text="Cancel" />
+                  <Button fx:id="cancelButton" layoutX="10.0" layoutY="13.0" mnemonicParsing="false" onAction="#cancelOperations" prefHeight="25.0" prefWidth="98.0" text="Cancel" />
                   <Button layoutX="140.0" layoutY="13.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="30.0" text="spacer2" visible="false" />
-                  <Button layoutX="140.0" layoutY="13.0" mnemonicParsing="false" opacity="0.5" prefHeight="25.0" prefWidth="140.0" text="Delete this Customer" />
+                  <Button fx:id="deleteButton" layoutX="140.0" layoutY="13.0" mnemonicParsing="false" onAction="#initiateDeleteCustomer" prefHeight="25.0" prefWidth="140.0" text="Delete this Customer" />
               </items>
             </ToolBar>
-            <Pane prefHeight="379.0" prefWidth="500.0">
+            <Pane prefHeight="302.0" prefWidth="500.0">
                <children>
-                  <ChoiceBox layoutX="310.0" layoutY="150.0" prefWidth="150.0" />
                   <Label layoutX="35.0" layoutY="30.0" minWidth="100.0" text="Customer ID">
                      <font>
                         <Font size="16.0" />
@@ -100,11 +94,6 @@
                         <Font size="16.0" />
                      </font>
                   </Label>
-                  <Label layoutX="35.0" layoutY="310.0" minWidth="100.0" text="Division ID">
-                     <font>
-                        <Font size="16.0" />
-                     </font>
-                  </Label>
                   <Label layoutX="35.0" layoutY="150.0" prefWidth="100.0" text="Country">
                      <font>
                         <Font size="16.0" />
@@ -115,35 +104,15 @@
                         <Font size="16.0" />
                      </font>
                   </Label>
-                  <Label layoutX="35.0" layoutY="350.0" minWidth="100.0" text="Customer ID">
-                     <font>
-                        <Font size="16.0" />
-                     </font>
-                  </Label>
-                  <TextField disable="true" editable="false" layoutX="310.0" layoutY="30.0" prefWidth="150.0" promptText="Auto-generated" />
-                  <TextField layoutX="310.0" layoutY="70.0" prefWidth="150.0" promptText="Enter a name" />
-                  <TextField layoutX="310.0" layoutY="110.0" prefWidth="150.0" promptText="Enter street address" />
-                  <TextField layoutX="310.0" layoutY="230.0" prefWidth="150.0" />
-                  <TextField layoutX="310.0" layoutY="270.0" prefWidth="150.0" />
-                  <TextField layoutX="310.0" layoutY="310.0" prefWidth="150.0" />
-                  <TextField layoutX="310.0" layoutY="350.0" prefWidth="150.0" />
-                  <ChoiceBox layoutX="310.0" layoutY="190.0" prefWidth="150.0" />
+                  <TextField fx:id="customerIDText" disable="true" editable="true" layoutX="310.0" layoutY="30.0" prefWidth="150.0" promptText="Auto-generated" />
+                  <TextField fx:id="customerNameText" layoutX="310.0" layoutY="70.0" prefWidth="150.0" promptText="Enter a name" />
+                  <TextField fx:id="customerAddressText" layoutX="310.0" layoutY="110.0" prefWidth="150.0" promptText="Enter street address" />
+                  <ComboBox fx:id="countryComboBox" layoutX="310.0" layoutY="150.0" onAction="#userSelectedCountry" prefWidth="150.0" promptText="Select Country first" />
+                  <ComboBox fx:id="firstDivisionComboBox" layoutX="310.0" layoutY="190.0" prefWidth="150.0" promptText="then First Level Div." />
+                  <TextField fx:id="customerPostalCodeText" layoutX="310.0" layoutY="230.0" prefWidth="150.0" promptText="Enter Postal Code" />
+                  <TextField fx:id="customerPhoneText" layoutX="310.0" layoutY="270.0" prefWidth="150.0" promptText="Enter Phone #" />
                </children>
             </Pane>
-            <ScrollPane prefHeight="200.0" prefWidth="200.0">
-              <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="487.0">
-                     <children>
-                        <TableView prefHeight="200.0" prefWidth="487.0">
-                          <columns>
-                            <TableColumn prefWidth="75.0" text="C1" />
-                            <TableColumn prefWidth="75.0" text="C2" />
-                          </columns>
-                        </TableView>
-                     </children>
-                  </AnchorPane>
-              </content>
-            </ScrollPane>
          </children>
       </VBox>
    </children>
