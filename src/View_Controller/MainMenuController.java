@@ -1,8 +1,7 @@
 package View_Controller;
 
-import Database.DAO.AppointmentDaoImpl;
-import Database.DAO.CustomerDaoImpl;
 import Database.Entities.Appointment;
+import Utilities.MyAlert;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -14,9 +13,9 @@ import javafx.scene.control.*;
 import Database.Entities.User;
 import javafx.fxml.Initializable;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import sample.Main;
-
 import java.io.IOException;
 import java.net.URL;
 import java.time.Instant;
@@ -125,7 +124,7 @@ public class MainMenuController implements Initializable {
    private TableColumn<Appointment, String> columnUserId;
 
    @FXML
-   private RadioButton weeklyCheckBox;
+   private RadioButton weeklyRadioButton;
 
    @FXML
    private RadioButton monthlyRadioButton;
@@ -133,10 +132,22 @@ public class MainMenuController implements Initializable {
    @FXML
    private Button viewCustomersButton;
    
+   @FXML
+   private Button generateReportButton;
+   
+   @FXML
+   private CheckBox typeCheckBox;
+   
+   @FXML
+   private CheckBox monthCheckBox;
+   
+   @FXML
+   private CheckBox countryCheckBox;
+   
    
    public static User activeUser = null;
-   private CustomerDaoImpl customerDaoImpl = new CustomerDaoImpl();
-   private AppointmentDaoImpl appointmentsDaoImpl = new AppointmentDaoImpl();
+   private Database.DAO.CustomerDaoImpl customerDaoImpl = new Database.DAO.CustomerDaoImpl();
+   private Database.DAO.AppointmentDaoImpl appointmentsDaoImpl = new Database.DAO.AppointmentDaoImpl();
    private final int appointmentReminderWindow = 15;
    private static boolean firstLogin = false;
    
@@ -240,7 +251,7 @@ public class MainMenuController implements Initializable {
          ArrayList<Appointment> limitedAppointments = null;
 
          // check if
-         if (weeklyCheckBox.isSelected() ) {
+         if (weeklyRadioButton.isSelected() ) {
             limitedAppointments = limitAppointments(ZonedDateTime.now().plusWeeks(1));
          }
          else if (monthlyRadioButton.isSelected()) {
@@ -310,10 +321,7 @@ public class MainMenuController implements Initializable {
 
    }
 
-
-
-
-
+   
    /**
     *  Method initData will store the User that has logged in to the system, while being called from an outside class.
     * @param activeUser The User that has successfully logged in.
@@ -323,8 +331,10 @@ public class MainMenuController implements Initializable {
 //      System.out.println("MainMenuController has received activeUser: " + activeUser.getUserName());
       firstLogin = true;
    }
+   
 
    /**
+    * Method populates the selected Appointment to the
     * @param actionEvent
     * @throws IOException
     */
@@ -342,6 +352,7 @@ public class MainMenuController implements Initializable {
       primaryStage.show();
 
    }
+   
 
    /**
     * Method is called by user action onto the Add New Appointment Button.
@@ -357,6 +368,7 @@ public class MainMenuController implements Initializable {
       Parent root = loader.load();
       primaryStage.setScene(new Scene(root));
       primaryStage.setResizable(false);
+      aac.initData(null);
 
       primaryStage.show();
    }
@@ -381,5 +393,74 @@ public class MainMenuController implements Initializable {
          e.getStackTrace();
       }
 
+   }
+   
+   
+   /**
+    * Method ensures one or more report variation is checked via its CheckBox then calls the report display.
+    * @param event Input ActionEvent from FXML's Application when user activates the Button generateReportButton.
+    */
+   @FXML
+   private void attemptReportGeneration(ActionEvent event) {
+   
+      // if no CheckBox is selected, show Alert then exit method
+      if (!typeCheckBox.isSelected() && !monthCheckBox.isSelected() && !countryCheckBox.isSelected()) {
+         MyAlert unknownAlert = new MyAlert(Alert.AlertType.ERROR);
+         unknownAlert.invalidSelectionAlert("Report option");
+      }
+   
+      // else, for any selected CheckBox, display relevant report.
+      if(typeCheckBox.isSelected()) {
+         typeReport();
+      }
+      if(monthCheckBox.isSelected()) {
+         monthReport();
+      }
+      if(countryCheckBox.isSelected()) {
+         countryReport();
+      }
+      
+   }
+   // TODO add report to UI of total number of Customer Appointments by type and month
+   //
+   //
+   //•  the total number of customer appointments by type and month
+   //
+   //•  a schedule for each contact in your organization that includes appointment ID, title, type and description, start date and time, end date and time, and customer ID
+   
+   
+   // TODO add schedule for each contact in the org w/ Appointment ID, title, type & description, start/end date + time, and customer ID.
+   
+   // TODO an additional report of my choosing!
+   
+   
+   private void typeReport() {
+      //Creating a dialog
+      Dialog<String> dialog = new Dialog<String>();
+      //Setting the title
+      dialog.setTitle("Dialog");
+      ButtonType type = new ButtonType("Ok", javafx.scene.control.ButtonBar.ButtonData.OK_DONE);
+      //Setting the content of the dialog
+      dialog.setContentText("This is a sample dialog");
+      //Adding buttons to the dialog pane
+      dialog.getDialogPane().getButtonTypes().add(type);
+      //Setting the label
+      javafx.scene.text.Text txt = new javafx.scene.text.Text("Click the button to show the dialog");
+      Font font = Font.font("verdana", javafx.scene.text.FontWeight.BOLD, javafx.scene.text.FontPosture.REGULAR, 12);
+      txt.setFont(font);
+      //Creating a button
+      Button button = new Button("Show Dialog");
+      //Showing the dialog on clicking the button
+      button.setOnAction(e -> {
+         dialog.showAndWait();
+      });
+   }
+   
+   
+   private void monthReport() {
+   }
+   
+   
+   private void countryReport() {
    }
 }
