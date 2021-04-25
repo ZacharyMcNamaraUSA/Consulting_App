@@ -1,6 +1,5 @@
 package View_Controller;
 
-import Database.DAO.ContactDaoImpl;
 import Database.Entities.Appointment;
 import Utilities.MyAlert;
 import javafx.collections.FXCollections;
@@ -274,8 +273,7 @@ public class MainMenuController implements Initializable {
    }
 
    private void setCellValueFactories() {
-
-
+      
       columnApptId.setCellValueFactory(new PropertyValueFactory<Appointment,Integer>("AppointmentID"));
       columnTitle.setCellValueFactory(new PropertyValueFactory<Appointment, String>("Title"));
       columnDescription.setCellValueFactory(new PropertyValueFactory<Appointment, String>("Description"));
@@ -349,6 +347,7 @@ public class MainMenuController implements Initializable {
       Parent root = loader.load();
       primaryStage.setScene(new Scene(root));
       primaryStage.setResizable(false);
+      primaryStage.setTitle("Consulting App - Edit an Appointment");
       aac.initData(getSelectedAppointment());
 
       primaryStage.show();
@@ -370,6 +369,7 @@ public class MainMenuController implements Initializable {
       Parent root = loader.load();
       primaryStage.setScene(new Scene(root));
       primaryStage.setResizable(false);
+      primaryStage.setTitle("Consulting App - Add an Appointment");
       aac.initData(null);
 
       primaryStage.show();
@@ -385,6 +385,7 @@ public class MainMenuController implements Initializable {
          Parent root = (Parent)loader.load();
          primaryStage.setScene(new Scene(root));
          primaryStage.setResizable(false);
+         primaryStage.setTitle("Consulting App - View All Customers");
          
          primaryStage.show();
          
@@ -413,33 +414,27 @@ public class MainMenuController implements Initializable {
          unknownAlert.invalidSelectionAlert("Report option");
       }
       
-      final boolean typeREPORT = false;
-      final boolean monthREPORT = false;
-      final boolean countryREPORT = false;
+//      final boolean typeREPORT = false;
+//      final boolean monthREPORT = false;
+//      final boolean countryREPORT = false;
    
       // else, for any selected CheckBox, display relevant report.
       if(typeAndMonthCheckBox.isSelected()) {
-         typeReport();
+         typeAndMonthReport();
       }
-      if(contactScheduleCheckBox.isSelected()) {
+      else if(contactScheduleCheckBox.isSelected()) {
          contactScheduleReport();
       }
-      if(countryCheckBox.isSelected()) {
+      else if(countryCheckBox.isSelected()) {
          countryReport();
       }
       
       
       
    }
-   //
-   //
-   //•  the total number of customer appointments by type and month
-   //
-   //•  a schedule for each contact in your organization that includes appointment ID, title, type and description, start date and time, end date and time, and customer ID
    
    
-   
-   private void typeReport() {
+   private void typeAndMonthReport() {
    
       // TODO add report to UI of total number of Customer Appointments by type and month
       System.out.println("report by Type & Month\n");
@@ -488,21 +483,42 @@ public class MainMenuController implements Initializable {
    }
    
    
+   /**
+    * Passes control to ReportContactSchedulesController.java when user selects to generate this report.
+    */
    private void contactScheduleReport() {
       // TODO add schedule for each Contact in the org w/ Appointment ID, title, type & description, start/end date + time, and customer ID.
    
       System.out.println("report of each Contact's schedule");
+   
+   
+      try {
+         Stage primaryStage = Main.myStage;
+   
+         FXMLLoader loader = new FXMLLoader(getClass().getResource("/View_Controller/ReportContactSchedules.fxml"));
+         ReportContactSchedulesController controller = new ReportContactSchedulesController();
+         loader.setController(controller);
+         Parent root = loader.load();
+         primaryStage.setScene(new Scene(root));
+         primaryStage.setResizable(false);
+         primaryStage.setTitle("Consulting App - Schedule by Contact");
+         
+         primaryStage.show();
       
-      // get every contact, iterate across them, display relevant info
-      Database.DAO.ContactDaoImpl contactDao = new ContactDaoImpl();
-      
-      // for each Contact
-      for (Database.Entities.Contact contact: contactDao.getAllContacts()) {
-      
+      } catch (IOException ioException) {
+         System.out.println("MainMenuController.ioException");
+         ioException.getStackTrace();
+      } catch (Exception e) {
+         e.getStackTrace();
       }
+      
+      
    }
    
    
+   /**
+    * Method passes control to ReportCountryController.java when user selects to generate this report.
+    */
    private void countryReport() {
       // TODO an additional report of every scheduled Appointment by Country the Customer is in.
    
