@@ -1,5 +1,6 @@
 package View_Controller;
 
+import Database.DAO.ContactDaoImpl;
 import Database.Entities.Appointment;
 import Utilities.MyAlert;
 import javafx.collections.FXCollections;
@@ -13,7 +14,7 @@ import javafx.scene.control.*;
 import Database.Entities.User;
 import javafx.fxml.Initializable;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.text.Font;
+import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import sample.Main;
 import java.io.IOException;
@@ -23,6 +24,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.ResourceBundle;
 
 public class MainMenuController implements Initializable {
@@ -136,10 +138,10 @@ public class MainMenuController implements Initializable {
    private Button generateReportButton;
    
    @FXML
-   private CheckBox typeCheckBox;
+   private CheckBox typeAndMonthCheckBox;
    
    @FXML
-   private CheckBox monthCheckBox;
+   private CheckBox contactScheduleCheckBox;
    
    @FXML
    private CheckBox countryCheckBox;
@@ -402,26 +404,33 @@ public class MainMenuController implements Initializable {
     */
    @FXML
    private void attemptReportGeneration(ActionEvent event) {
+      
+      System.out.println("generate report(s)!");
    
       // if no CheckBox is selected, show Alert then exit method
-      if (!typeCheckBox.isSelected() && !monthCheckBox.isSelected() && !countryCheckBox.isSelected()) {
+      if (!typeAndMonthCheckBox.isSelected() && !contactScheduleCheckBox.isSelected() && !countryCheckBox.isSelected()) {
          MyAlert unknownAlert = new MyAlert(Alert.AlertType.ERROR);
          unknownAlert.invalidSelectionAlert("Report option");
       }
+      
+      final boolean typeREPORT = false;
+      final boolean monthREPORT = false;
+      final boolean countryREPORT = false;
    
       // else, for any selected CheckBox, display relevant report.
-      if(typeCheckBox.isSelected()) {
+      if(typeAndMonthCheckBox.isSelected()) {
          typeReport();
       }
-      if(monthCheckBox.isSelected()) {
-         monthReport();
+      if(contactScheduleCheckBox.isSelected()) {
+         contactScheduleReport();
       }
       if(countryCheckBox.isSelected()) {
          countryReport();
       }
       
+      
+      
    }
-   // TODO add report to UI of total number of Customer Appointments by type and month
    //
    //
    //•  the total number of customer appointments by type and month
@@ -429,38 +438,105 @@ public class MainMenuController implements Initializable {
    //•  a schedule for each contact in your organization that includes appointment ID, title, type and description, start date and time, end date and time, and customer ID
    
    
-   // TODO add schedule for each contact in the org w/ Appointment ID, title, type & description, start/end date + time, and customer ID.
-   
-   // TODO an additional report of my choosing!
-   
    
    private void typeReport() {
-      //Creating a dialog
-      Dialog<String> dialog = new Dialog<String>();
-      //Setting the title
-      dialog.setTitle("Dialog");
-      ButtonType type = new ButtonType("Ok", javafx.scene.control.ButtonBar.ButtonData.OK_DONE);
-      //Setting the content of the dialog
-      dialog.setContentText("This is a sample dialog");
-      //Adding buttons to the dialog pane
-      dialog.getDialogPane().getButtonTypes().add(type);
-      //Setting the label
-      javafx.scene.text.Text txt = new javafx.scene.text.Text("Click the button to show the dialog");
-      Font font = Font.font("verdana", javafx.scene.text.FontWeight.BOLD, javafx.scene.text.FontPosture.REGULAR, 12);
-      txt.setFont(font);
-      //Creating a button
-      Button button = new Button("Show Dialog");
-      //Showing the dialog on clicking the button
-      button.setOnAction(e -> {
-         dialog.showAndWait();
-      });
+   
+      // TODO add report to UI of total number of Customer Appointments by type and month
+      System.out.println("report by Type & Month\n");
+   
+      ArrayList<String> typeList = new ArrayList<>();
+      ArrayList<String> monthsList = new ArrayList<>();
+      String contextText = "";
+   
+      for (Appointment appointment: appointmentsDaoImpl.getAllAppointments() ) {
+         typeList.add(appointment.getType());
+         
+         ZonedDateTime appointmentStartZDT = appointment.getStartZonedDateTime();
+         String monthName = appointmentStartZDT.format(DateTimeFormatter.ofPattern("MMMM"));
+         monthsList.add(monthName);
+      }
+      
+      // create a temporary copy of the ArrayList containing every Type, so we do not show duplicates.
+      ArrayList<String> typeListClone = (ArrayList<String>) typeList.clone();
+      System.out.println("typeListClone original size is same as typeList at " + typeListClone.size() + " elements.");
+
+      
+      for (String currentType: typeListClone) {
+         
+         int frequency = Collections.frequency(typeListClone, currentType);
+   
+         if (frequency > 0) {
+            System.out.println("Printing then removing type: " + currentType + ".");
+            System.out.println("\tfrequency: " + frequency);
+            
+            contextText += "\tCount: " + frequency + "\tof Type " + currentType + ".\n";
+         }
+         
+         // creating ANOTHER temp clone...
+         ArrayList<String> typeRemovingDuplicates = (ArrayList<String>) typeListClone.clone();
+         // remove all elements matching the current String.
+         while (typeRemovingDuplicates.contains(currentType)) {
+            typeRemovingDuplicates.remove(currentType);
+         }
+         
+         // set the ArrayList, that is originally being iterated across, equal to the ArrayList with duplicates of currentType removed.
+         typeListClone = (ArrayList<String>) typeRemovingDuplicates.clone();
+      }
+      
+      //Create dialog
+      myDialog("Appointments by Type & Month", "Below is each Appointment type and its count.", contextText);
    }
    
    
-   private void monthReport() {
+   private void contactScheduleReport() {
+      // TODO add schedule for each Contact in the org w/ Appointment ID, title, type & description, start/end date + time, and customer ID.
+   
+      System.out.println("report of each Contact's schedule");
+      
+      // get every contact, iterate across them, display relevant info
+      Database.DAO.ContactDaoImpl contactDao = new ContactDaoImpl();
+      
+      // for each Contact
+      for (Database.Entities.Contact contact: contactDao.getAllContacts()) {
+      
+      }
    }
    
    
    private void countryReport() {
+      // TODO an additional report of every scheduled Appointment by Country the Customer is in.
+   
+      System.out.println("report grouping every Appointment by the Country the Customer is in");
+   }
+   
+   
+   /**
+    * Method creates a Dialog, using parameters, and resizes it.
+    *    This seemed like a cleaner solution.
+    * @param title Input String to be the Dialog's title text.
+    * @param header Input String to be the Dialog's header text.
+    * @param content Input String to be the Dialog's content text.
+    */
+   private void myDialog(String title, String header, String content) {
+      
+      //Creating a dialog
+      Dialog<String> dialog = new Dialog<String>();
+      
+      //Setting the title
+      dialog.setTitle(title);
+      
+      // Setting the header of the dialog
+      dialog.setHeaderText(header);
+      //Setting the content of the dialog
+      dialog.setContentText(content);
+      
+      //Adding done/close button to the dialog pane
+      ButtonType type = new ButtonType("Done", ButtonBar.ButtonData.OK_DONE);
+      dialog.getDialogPane().getButtonTypes().add(type);
+      
+      // resize dialog
+      dialog.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+      
+      dialog.showAndWait();
    }
 }
