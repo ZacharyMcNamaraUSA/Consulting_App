@@ -1,7 +1,10 @@
 package View_Controller;
 
+import Database.DAO.CountryDaoImpl;
+import Database.DAO.FirstLevelDivisionDaoImpl;
 import Database.Entities.Appointment;
 import Utilities.MyAlert;
+import Utilities.TimeUtilities;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -137,7 +140,10 @@ public class MainMenuController implements Initializable {
    private Button generateReportButton;
    
    @FXML
-   private CheckBox typeAndMonthCheckBox;
+   private CheckBox typeCheckBox;
+   
+   @FXML
+   private CheckBox monthCheckBox;
    
    @FXML
    private CheckBox contactScheduleCheckBox;
@@ -177,6 +183,7 @@ public class MainMenuController implements Initializable {
       }
    }
 
+   
    /**
     * Method creates a Dialog window to inform the user if they have an appointment soon or not.
     * This method uses findNextAppointment to find the upcoming appointment for the activeUser then calculates the difference in time and date between then and now.
@@ -217,6 +224,7 @@ public class MainMenuController implements Initializable {
       }
    }
 
+   
    /**
     * Method receives a User parameter to be compared against all appointments and returns the
     * @param user Receives a User to compare IDs with all appointments.
@@ -271,7 +279,11 @@ public class MainMenuController implements Initializable {
       appointmentsTableView.setItems(appointmentObservableList);
 
    }
-
+   
+   
+   /**
+    * Method uses property value factory on appointmentTableView.
+    */
    private void setCellValueFactories() {
       
       columnApptId.setCellValueFactory(new PropertyValueFactory<Appointment,Integer>("AppointmentID"));
@@ -409,18 +421,18 @@ public class MainMenuController implements Initializable {
       System.out.println("generate report(s)!");
    
       // if no CheckBox is selected, show Alert then exit method
-      if (!typeAndMonthCheckBox.isSelected() && !contactScheduleCheckBox.isSelected() && !countryCheckBox.isSelected()) {
+      if (!typeCheckBox.isSelected() && !monthCheckBox.isSelected() && !contactScheduleCheckBox.isSelected() && !countryCheckBox.isSelected()) {
          MyAlert unknownAlert = new MyAlert(Alert.AlertType.ERROR);
          unknownAlert.invalidSelectionAlert("Report option");
+         return;
       }
-      
-//      final boolean typeREPORT = false;
-//      final boolean monthREPORT = false;
-//      final boolean countryREPORT = false;
    
       // else, for any selected CheckBox, display relevant report.
-      if(typeAndMonthCheckBox.isSelected()) {
-         typeAndMonthReport();
+      if(typeCheckBox.isSelected()) {
+         typeReport();
+      }
+      else if (monthCheckBox.isSelected()) {
+         monthReport();
       }
       else if(contactScheduleCheckBox.isSelected()) {
          contactScheduleReport();
@@ -429,37 +441,33 @@ public class MainMenuController implements Initializable {
          countryReport();
       }
       
-      
-      
    }
    
    
-   private void typeAndMonthReport() {
-   
+   /**
+    * Method creates and shows Appointment report, sorted by Type.
+    */
+   private void typeReport() {
+      
       // TODO add report to UI of total number of Customer Appointments by type and month
-      System.out.println("report by Type & Month\n");
-   
+      System.out.println("report by Type\n");
+      
       ArrayList<String> typeList = new ArrayList<>();
-      ArrayList<String> monthsList = new ArrayList<>();
       String contextText = "";
-   
+      
       for (Appointment appointment: appointmentsDaoImpl.getAllAppointments() ) {
          typeList.add(appointment.getType());
-         
-         ZonedDateTime appointmentStartZDT = appointment.getStartZonedDateTime();
-         String monthName = appointmentStartZDT.format(DateTimeFormatter.ofPattern("MMMM"));
-         monthsList.add(monthName);
       }
       
       // create a temporary copy of the ArrayList containing every Type, so we do not show duplicates.
       ArrayList<String> typeListClone = (ArrayList<String>) typeList.clone();
       System.out.println("typeListClone original size is same as typeList at " + typeListClone.size() + " elements.");
-
+      
       
       for (String currentType: typeListClone) {
          
          int frequency = Collections.frequency(typeListClone, currentType);
-   
+         
          if (frequency > 0) {
             System.out.println("Printing then removing type: " + currentType + ".");
             System.out.println("\tfrequency: " + frequency);
@@ -479,7 +487,54 @@ public class MainMenuController implements Initializable {
       }
       
       //Create dialog
-      myDialog("Appointments by Type & Month", "Below is each Appointment type and its count.", contextText);
+      myDialog("Appointments by Type", "Below is each Appointment type and its count.", contextText);
+   }
+   
+   
+   /**
+    * Method creates and shows Appointment report, sorted by Month.
+    */
+   private void monthReport() {
+      
+      // TODO add report to UI of total number of Customer Appointments by type and month
+      System.out.println("report by Month\n");
+      ArrayList<String> monthsList = new ArrayList<>();
+      String contentText = "";
+      
+      for (Appointment appointment: appointmentsDaoImpl.getAllAppointments() ) {
+         monthsList.add(appointment.getStartZonedDateTime().format(DateTimeFormatter.ofPattern("MMMM")));
+      }
+      
+      // create a temporary copy of the ArrayList containing every Type, so we do not show duplicates.
+      ArrayList<String> monthsListClone = (ArrayList<String>) monthsList.clone();
+      System.out.println("monthsListClone original size is same as typeList at " + monthsListClone.size() + " elements.");
+      
+      for (String currentMonth: monthsListClone) {
+         
+         int frequency = Collections.frequency(monthsListClone, currentMonth);
+         
+         if (frequency > 0) {
+            System.out.println("Printing then removing month: " + currentMonth + ".");
+            System.out.println("\tfrequency: " + frequency);
+            
+            contentText += "\t" + currentMonth + " has " + frequency +  " Appointment(s).\n";
+         }
+         
+         // creating ANOTHER temp clone...
+         ArrayList<String> monthsRemovingDuplicates = (ArrayList<String>) monthsListClone.clone();
+         // remove all elements matching the current String.
+         while (monthsRemovingDuplicates.contains(currentMonth)) {
+            monthsRemovingDuplicates.remove(currentMonth);
+         }
+         
+         // set the ArrayList, that is originally being iterated across, equal to the ArrayList with duplicates of currentMonth removed.
+         monthsListClone = (ArrayList<String>) monthsRemovingDuplicates.clone();
+      }
+      
+      //Create dialog
+      myDialog("Appointments by Month",
+                "Below, every Appointment is grouped by their month then counted.",
+                contentText);
    }
    
    
@@ -523,6 +578,62 @@ public class MainMenuController implements Initializable {
       // TODO an additional report of every scheduled Appointment by Country the Customer is in.
    
       System.out.println("report grouping every Appointment by the Country the Customer is in");
+      
+      ArrayList<String> countryList = new ArrayList<>();
+      String contentText = "";
+      Database.Entities.Country country = null;
+      Database.DAO.FirstLevelDivisionDaoImpl firstLevelDivisionDao = new FirstLevelDivisionDaoImpl();
+      CountryDaoImpl countryDao = new CountryDaoImpl();
+   
+      // for each Appointment
+      for (Appointment appointment: appointmentsDaoImpl.getAllAppointments() ) {
+         
+         // Find the Customer from the Appointment
+         Database.Entities.Customer customer = customerDaoImpl.getSingleCustomer(appointment.getCustomerId());
+         
+         // Find the Country from the Customer's FirstDivisionId
+         Database.Entities.FirstLevelDivision firstLevelDivision = firstLevelDivisionDao.getFirstLevelDivision(customer.getFirstDivisionId());
+         country = countryDao.getCountry(firstLevelDivision.getCountryId());
+         
+         // add country's name (String) to countryList
+         countryList.add(country.getCountryName());
+         
+         // reset country for next iteration
+         country = null;
+         
+      }
+   
+      // create a temporary copy of the ArrayList containing every Type, so we do not show duplicates.
+      ArrayList<String> countryListClone = (ArrayList<String>) countryList.clone();
+      System.out.println("countryListClone original size is same as countryList at " + countryListClone.size() + " elements.");
+   
+   
+      for (String currentCountry: countryListClone) {
+      
+         int frequency = Collections.frequency(countryListClone, currentCountry);
+      
+         if (frequency > 0) {
+            System.out.println("Printing then removing type: " + currentCountry + ".");
+            System.out.println("\tfrequency: " + frequency);
+         
+            contentText += "" + frequency + "\t Appointment(s) in " + currentCountry + ".\n";
+         }
+      
+         // creating ANOTHER temp clone...
+         ArrayList<String> typeRemovingDuplicates = (ArrayList<String>) countryListClone.clone();
+         // remove all elements matching the current String.
+         while (typeRemovingDuplicates.contains(currentCountry)) {
+            typeRemovingDuplicates.remove(currentCountry);
+         }
+      
+         // set the ArrayList, that is originally being iterated across, equal to the ArrayList with duplicates of currentCountry removed.
+         countryListClone = (ArrayList<String>) typeRemovingDuplicates.clone();
+      }
+   
+      //Create dialog
+      myDialog("Appointments by Country",
+                "Each Appointment is sorted by the Country of the Customer \n\t- useful global view of market share.",
+                contentText);
    }
    
    
