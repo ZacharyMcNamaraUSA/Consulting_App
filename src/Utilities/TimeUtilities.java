@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
 public class TimeUtilities {
 
    public static final ZoneId userZoneId = ZoneId.systemDefault();
-   public static final ZoneId homeOfficeZoneId = ZoneId.of("America/New_York");
+   public static final ZoneId headquartersZoneId = ZoneId.of("America/New_York");
    public static String databaseDateTimeFormat = "uuuu-MM-dd HH:mm:ss";
    public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(databaseDateTimeFormat);
    public static final DateTimeFormatter timeFormatterLong = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -16,27 +16,41 @@ public class TimeUtilities {
    private static final LocalTime businessHoursEnd =  LocalTime.of(22, 0);
    
    private static final ZonedDateTime businessOpenZonedDateTime = ZonedDateTime.of(
-             LocalDate.now(homeOfficeZoneId),
+             LocalDate.now(headquartersZoneId),
              businessHoursStart,
-             homeOfficeZoneId);
+             headquartersZoneId);
    private static final ZonedDateTime businessCloseZonedDateTime = ZonedDateTime.of(
-             LocalDate.now(homeOfficeZoneId),
+             LocalDate.now(headquartersZoneId),
              businessHoursEnd,
-             homeOfficeZoneId);
+             headquartersZoneId);
    
    public static final Instant businessOpen = businessOpenZonedDateTime.toInstant();
    public static final Instant businessClosed = businessCloseZonedDateTime.toInstant();
    
    
-   /** Method tests if input ZonedDateTime is during business hours.
-    * @param instant Input Instant to be tested against business hours.
-    * @return Returns true if the input is between business hours or false if not.
-    */
-   public static boolean isDuringBusinessHours(Instant instant) {
+   public static Instant getBusinessOpenInstant(LocalDate localDate) {
+      Instant instant = null;
       
-      return instant.isBefore(businessClosed) && businessOpen.isBefore(instant);
+      LocalDateTime openLDT = localDate.atTime(businessHoursStart);
+      ZonedDateTime openZDT = openLDT.atZone(headquartersZoneId);
       
+      instant = openZDT.toInstant();
+      
+      return instant;
    }
+   
+   
+   public static Instant getBusinessClosedInstant(LocalDate localDate) {
+      Instant instant = null;
+      
+      LocalDateTime closeLDT = localDate.atTime(businessHoursEnd);
+      ZonedDateTime closeZDT = closeLDT.atZone(headquartersZoneId);
+      
+      instant = closeZDT.toInstant();
+      
+      return instant;
+   }
+   
    
 
    /**
@@ -65,7 +79,7 @@ public class TimeUtilities {
    }
    
 
-   public static ZonedDateTime parseStringToZonedDateTime(String dateTime) {
+   public static ZonedDateTime parseDatabaseStringToZonedDateTime(String dateTime) {
       LocalDateTime ldt = LocalDateTime.parse(dateTime, DateTimeFormatter.ofPattern(databaseDateTimeFormat));
       ZonedDateTime zonedDateTime = ldt.atZone(ZoneId.of("Z"));
       ZonedDateTime adjustedZonedDT =  zonedDateTime.withZoneSameInstant(userZoneId);
@@ -82,5 +96,4 @@ public class TimeUtilities {
       return zdt.format(dateTimeFormatter);
    }
    
-
 }
