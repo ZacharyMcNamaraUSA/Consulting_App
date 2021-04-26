@@ -422,6 +422,7 @@ public class CustomerAlterController implements Initializable {
             Parent root = (Parent)loader.load();
             primaryStage.setScene(new Scene(root));
             primaryStage.setResizable(false);
+            primaryStage.setTitle("Consulting App - View All Customers");
         
             primaryStage.show();
         
