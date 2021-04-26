@@ -135,11 +135,6 @@ public class UserLoginMainController implements Initializable {
 
       adjustTextToUserSettings();
       populateUserNames();
-
-      // for testing purposes
-      // TODO REMOVE AUTO-ENTERED PASSWORD
-      loginUserNameChoiceBox.setValue("test");
-      loginPasswordField.setText("test");
       
    }
 
@@ -168,16 +163,11 @@ public class UserLoginMainController implements Initializable {
          loginFail();
       }
 
-//      System.out.println("Initiate login for user '" + username + "'!");
-//      System.out.println("\tPassword entered = " + enteredPassword);
-      System.out.println((storedPassword.equals(enteredPassword)) ? "\tPasswords match!" : "\tPasswords do not match.");
-
       if (enteredPassword.equals(storedPassword)) {
          successfulLogin = true;
          loginUser = usersDaoImpl.getSingleUsers(username);
       }
       else {     //login failed
-
          loginFail();
       }
 
