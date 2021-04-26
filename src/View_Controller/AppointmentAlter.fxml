@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="498.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="595.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <MenuBar layoutX="-7.0" prefHeight="40.0" prefWidth="507.0">
          <menus>
@@ -56,7 +56,7 @@
             </Menu>
          </menus>
       </MenuBar>
-      <VBox layoutY="30.0" prefHeight="506.0" prefWidth="500.0">
+      <VBox layoutY="30.0" prefHeight="565.0" prefWidth="500.0">
          <children>
             <ToolBar nodeOrientation="LEFT_TO_RIGHT" prefHeight="40.0" prefWidth="200.0">
                <items>
@@ -67,7 +67,7 @@
                   <Button fx:id="deleteAppointmentButton" layoutX="140.0" layoutY="13.0" mnemonicParsing="false" onAction="#initiateDelete" prefHeight="25.0" prefWidth="154.0" text="Delete this Appointment" />
                </items>
             </ToolBar>
-            <Pane prefHeight="484.0" prefWidth="500.0">
+            <Pane prefHeight="568.0" prefWidth="500.0">
                <children>
                   <Label layoutX="35.0" layoutY="30.0" minWidth="100.0" text="Appointment ID">
                      <font>
@@ -84,32 +84,7 @@
                         <Font size="16.0" />
                      </font>
                   </Label>
-                  <Label fx:id="date" layoutX="35.0" layoutY="230.0" minWidth="100.0" text="Date">
-                     <font>
-                        <Font size="16.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="35.0" layoutY="310.0" minWidth="100.0" text="End time">
-                     <font>
-                        <Font size="16.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="35.0" layoutY="350.0" minWidth="100.0" text="Customer ID">
-                     <font>
-                        <Font size="16.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="35.0" layoutY="390.0" minWidth="100.0" text="Contact Name">
-                     <font>
-                        <Font size="16.0" />
-                     </font>
-                  </Label>
                   <Label layoutX="35.0" layoutY="150.0" prefWidth="100.0" text="Location">
-                     <font>
-                        <Font size="16.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="35.0" layoutY="430.0" minWidth="100.0" text="User ID">
                      <font>
                         <Font size="16.0" />
                      </font>
@@ -119,7 +94,37 @@
                         <Font size="16.0" />
                      </font>
                   </Label>
+                  <Label fx:id="date" layoutX="35.0" layoutY="230.0" minWidth="100.0" text="Date">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
                   <Label layoutX="35.0" layoutY="270.0" minWidth="100.0" text="Start time">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="35.0" layoutY="310.0" minWidth="100.0" prefHeight="25.0" prefWidth="172.0" text="Duration (minutes)">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="35.0" layoutY="350.0" minWidth="100.0" text="End time">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="35.0" layoutY="390.0" minWidth="100.0" text="Customer ID">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="35.0" layoutY="430.0" minWidth="100.0" text="Contact Name">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="35.0" layoutY="470.0" minWidth="100.0" text="User ID">
                      <font>
                         <Font size="16.0" />
                      </font>
@@ -130,11 +135,16 @@
                   <TextField fx:id="locationText" layoutX="310.0" layoutY="150.0" prefWidth="150.0" promptText="Enter location" />
                   <TextField fx:id="typeText" layoutX="310.0" layoutY="190.0" prefWidth="150.0" promptText="Enter type" />
                   <DatePicker fx:id="datePicker" layoutX="310.0" layoutY="230.0" prefHeight="25.0" prefWidth="150.0" promptText="Select appt. date" />
-                  <TextField fx:id="startTimeText" layoutX="310.0" layoutY="270.0" prefWidth="150.0" promptText="Use HH:mm:ss format" />
-                  <TextField fx:id="endTimeText" layoutX="310.0" layoutY="310.0" prefWidth="150.0" promptText="Use HH:mm:ss format" />
-                  <TextField fx:id="customerIDText" layoutX="310.0" layoutY="348.0" prefWidth="150.0" promptText="Enter Customer ID" />
-                  <ComboBox fx:id="contactComboBox" layoutX="310.0" layoutY="390.0" prefWidth="150.0" promptText="Select a Contact" />
-                  <TextField fx:id="userIDText" layoutX="310.0" layoutY="430.0" prefWidth="150.0" promptText="Enter User ID" />
+                  <ComboBox fx:id="startTimeComboBox" layoutX="310.0" layoutY="270.0" prefWidth="150.0" promptText="Select start time" />
+                  <TextField fx:id="customerIDText" layoutX="310.0" layoutY="390.0" prefWidth="150.0" promptText="Enter Customer ID" />
+                  <ComboBox fx:id="contactComboBox" layoutX="310.0" layoutY="430.0" prefWidth="150.0" promptText="Select a Contact" />
+                  <TextField fx:id="userIDText" layoutX="310.0" layoutY="470.0" prefWidth="150.0" promptText="Enter User ID" />
+                  <ComboBox fx:id="durationTimeComboBox" layoutX="310.0" layoutY="310.0" onAction="#calculateEndTime" prefWidth="150.0" promptText="Select duration" />
+                  <Label fx:id="endTimeLabel" layoutX="310.0" layoutY="350.0" minWidth="100.0" prefHeight="25.0" prefWidth="150.0" text="N/A">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
                </children>
             </Pane>
          </children>

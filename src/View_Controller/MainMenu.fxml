@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
@@ -59,7 +60,7 @@
       </MenuBar>
       <ToolBar layoutY="760.0" prefHeight="40.0" prefWidth="829.0">
         <items>
-            <Button fx:id="viewCustomersButton" defaultButton="true" mnemonicParsing="false" onAction="#viewAllCustomers" prefHeight="9.0" prefWidth="192.0" text="View all Customers" wrapText="true">
+            <Button fx:id="viewCustomersButton" mnemonicParsing="false" onAction="#viewAllCustomers" prefHeight="9.0" prefWidth="192.0" text="View all Customers" wrapText="true">
                <font>
                   <Font size="16.0" />
                </font>
@@ -76,7 +77,7 @@
          <children>
             <Pane prefHeight="130.0" prefWidth="200.0">
                <children>
-                  <RadioButton fx:id="weeklyCheckBox" layoutX="15.0" layoutY="65.0" mnemonicParsing="false" selected="true" text="Weekly" toggleGroup="$viewSwap">
+                  <RadioButton fx:id="weeklyRadioButton" layoutX="15.0" layoutY="65.0" mnemonicParsing="false" selected="true" text="Weekly" toggleGroup="$viewSwap">
                      <font>
                         <Font size="15.0" />
                      </font>
@@ -95,7 +96,34 @@
                      </font>
                   </Label>
                </children></Pane>
-            <Pane layoutY="138.0" prefHeight="605.0" prefWidth="200.0" />
+            <Pane layoutY="138.0" prefHeight="605.0" prefWidth="200.0">
+               <children>
+                  <Label layoutX="10.0" layoutY="10.0" text="Report options">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                  </Label>
+                  <CheckBox fx:id="typeAndMonthCheckBox" layoutX="10.0" layoutY="93.0" mnemonicParsing="false" text="Type &amp; Month">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </CheckBox>
+                  <CheckBox fx:id="contactScheduleCheckBox" layoutX="10.0" layoutY="139.0" mnemonicParsing="false" text="Contact's schedule">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </CheckBox>
+                  <CheckBox fx:id="countryCheckBox" layoutX="10.0" layoutY="191.0" mnemonicParsing="false" text="Country">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </CheckBox>
+                  <Button fx:id="generateReportButton" layoutX="40.0" layoutY="242.0" mnemonicParsing="false" onAction="#attemptReportGeneration" prefHeight="91.0" prefWidth="96.0" text="Generate Report" wrapText="true">
+                     <font>
+                        <Font size="17.0" />
+                     </font></Button>
+                  <Label layoutX="10.0" layoutY="45.0" prefHeight="37.0" prefWidth="158.0" text="Please note, only one report may be generated at a time." wrapText="true" />
+               </children></Pane>
             <Pane layoutX="200.0" prefHeight="735.0" prefWidth="1000.0">
                <children>
                   <TableView fx:id="appointmentsTableView" editable="true" maxWidth="10000.0" prefHeight="735.0" prefWidth="1000.0">

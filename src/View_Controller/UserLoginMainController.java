@@ -193,12 +193,10 @@ public class UserLoginMainController implements Initializable {
                Stage primaryStage = Main.myStage;
 
                FXMLLoader loader = new FXMLLoader(getClass().getResource("/View_Controller/MainMenu.fxml"));
-//               URL fxmlLocation = getClass().getResource("/View_Controller/MainMenu.fxml");
-//               loader.setLocation(fxmlLocation);
-//               loader.setController(mainMenuController);
                Parent root = loader.load();
                primaryStage.setScene(new Scene(root));
                primaryStage.setResizable(false);
+               primaryStage.setTitle("Consulting App - Main Menu");
 
             primaryStage.show();
 
