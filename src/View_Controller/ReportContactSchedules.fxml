@@ -56,9 +56,9 @@
       </MenuBar>
       <Pane layoutY="25.0" prefHeight="728.0" prefWidth="1200.0">
          <children>
-            <Pane prefHeight="735.0" prefWidth="200.0">
+            <Pane prefHeight="735.0" prefWidth="170.0">
                <children>
-                  <ComboBox fx:id="contactComboBox" layoutX="14.0" layoutY="70.0" onAction="#userSelectedContact" prefWidth="150.0" />
+                  <ComboBox fx:id="contactComboBox" layoutX="10.0" layoutY="70.0" onAction="#userSelectedContact" prefHeight="25.0" prefWidth="145.0" />
                   <Label layoutX="14.0" layoutY="32.0" prefHeight="25.0" prefWidth="120.0" text="Select a Contact">
                      <font>
                         <Font size="16.0" />
@@ -70,9 +70,9 @@
                      </font></Button>
                </children>
             </Pane>
-            <Pane layoutX="200.0" prefHeight="735.0" prefWidth="863.0">
+            <Pane layoutX="170.0" prefHeight="735.0" prefWidth="895.0">
                <children>
-                  <TableView fx:id="appointmentTableView" editable="true" maxWidth="10000.0" prefHeight="735.0" prefWidth="865.0">
+                  <TableView fx:id="appointmentTableView" editable="true" layoutX="-3.0" maxWidth="10000.0" prefHeight="735.0" prefWidth="898.0">
                      <columns>
                         <TableColumn fx:id="columnApptId" prefWidth="80.0" text="Appt ID" />
                         <TableColumn fx:id="columnTitle" prefWidth="90.0" text="Title" />
@@ -81,7 +81,7 @@
                         <TableColumn fx:id="columnType" prefWidth="110.0" resizable="true" text="Type" />
                         <TableColumn fx:id="columnStartDateTime" prefWidth="120.0" text="Start" />
                         <TableColumn fx:id="columnEndDateTime" prefWidth="120.0" text="End" />
-                        <TableColumn fx:id="columnCustomerID" prefWidth="80.0" text="Customer ID" />
+                        <TableColumn fx:id="columnCustomerID" prefWidth="115.0" text="Customer ID" />
                      </columns>
                   </TableView>
                </children>
