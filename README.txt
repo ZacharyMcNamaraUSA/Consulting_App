@@ -15,5 +15,6 @@ To run this program, most functionality is simplistic by nature, but there are a
     To Delete a record from the database the user must be on the 'Edit' screen/Scene. This includes, Appointment, Customer, among others.
     There are four (4) different reports for this Program...
         the Appointment by Type Report and Appointment by Month Report have been separated for readability. 
-
-
+    
+    A script for initial database population has been provided for the user, src/Database/database-repopulation-script.txt...
+        However, additional datum has been added to the database for increased development testing. The user may override or delete any and all data.
