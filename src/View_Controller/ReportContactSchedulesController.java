@@ -183,9 +183,10 @@ public class ReportContactSchedulesController implements Initializable {
      }
      
      
-     
+     /**
+      * Method uses property value factory on appointmentTableView.
+      */
      private void setCellValueFactories() {
-          // OK
           columnApptId.setCellValueFactory(new PropertyValueFactory<Appointment,Integer>("AppointmentID"));
           columnTitle.setCellValueFactory(new PropertyValueFactory<Appointment, String>("Title"));
           columnDescription.setCellValueFactory(new PropertyValueFactory<Appointment, String>("Description"));
