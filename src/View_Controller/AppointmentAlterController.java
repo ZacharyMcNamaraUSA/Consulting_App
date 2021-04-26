@@ -6,6 +6,7 @@ import Database.DAO.CustomerDaoImpl;
 import Database.Entities.Appointment;
 import Database.Entities.Contact;
 import Database.Entities.Customer;
+import Utilities.MyAlert;
 import Utilities.TimeUtilities;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -120,12 +121,18 @@ public class AppointmentAlterController implements Initializable {
 
    @FXML
    private DatePicker datePicker;
+   
+   @FXML
+   private ComboBox<LocalTime> startTimeComboBox;
+   
+   @FXML
+   private ComboBox<Long> durationTimeComboBox;
+   
+   @FXML
+   private Label endTimeLabel;
 
    @FXML
    private TextField startTimeText;
-
-   @FXML
-   private TextField endTimeText;
 
    @FXML
    private TextField appointmentIDText;
@@ -136,14 +143,15 @@ public class AppointmentAlterController implements Initializable {
    private AppointmentDaoImpl appointmentDao = new AppointmentDaoImpl();
    private ContactDaoImpl contactDao = new ContactDaoImpl();
    private CustomerDaoImpl customerDao = new CustomerDaoImpl();
+   private final int VALID = 10;
+   private final int INVALID = -10;
    
    
    /**
     * Default constructor.
     */
    public AppointmentAlterController()  {
-      System.out.println("AAC constructor");
-      
+   
    }
    
    
@@ -154,9 +162,9 @@ public class AppointmentAlterController implements Initializable {
     */
    @Override
    public void initialize(URL url, ResourceBundle resourceBundle) {
-      System.out.println("AAC initialize");
       
       populateContactComboBox();
+   
    }
 
 
@@ -165,8 +173,9 @@ public class AppointmentAlterController implements Initializable {
     * @param appointment Input Appointment that is sent to this controller to be altered.
     */
    public void initData(Appointment appointment) {
-      System.out.println("AAC initData");
       populateContactComboBox();
+      populateAppointmentStartTimes();
+      populateAppointmentDurations();
       
       if (appointment == null)
          return;
@@ -174,9 +183,10 @@ public class AppointmentAlterController implements Initializable {
    
       populateFields();
       commitAppointmentButton.setText("Update Appointment");
+   
    }
-
-
+   
+   
    /**
     * Method retrieves data for the current Appointment then calls the correct database update.
     * @param event ActionEvent input from user's button press to commit this Appointment.
@@ -184,78 +194,29 @@ public class AppointmentAlterController implements Initializable {
    @FXML
    private void commitAppointment(ActionEvent event) throws IOException {
    
-      Instant start = retrieveStartZonedDateTime().toInstant();
-      Instant end = retrieveEndZonedDateTime().toInstant();
-   
-      // TODO Appointment must be during business hours
-      // TODO Appointment cannot schedule overlap any other Appointment, by Customer.
-      if (!testForBusinessHours(start, end) || !hasNoOverlappingAppointments(start, end)) {
-         invalidDateTimeAlert();
-         
-         return;
-      }
-   
-      if (appointment != null) {
-         updateAppointment();
-      }
-      else
-         saveNewAppointment();
-   }
-   
-   
-   private boolean testForBusinessHours(Instant start, Instant end) {
-   
-      if (!TimeUtilities.isDuringBusinessHours(start) || !TimeUtilities.isDuringBusinessHours(end)) {
-         // if either the start or end of the Appointment is outside of business hours, cancel commit.
-         invalidDateTimeAlert();
-         return false;
-      }
-      
-      return true;
-   }
-   
-   
-   private boolean hasNoOverlappingAppointments(Instant start, Instant end) {
-      
-      // Ensure user-input leads to a valid Customer then the Appointment times.
-      if (retrieveCustomer() != null && customerDao.getAllCustomers().contains(retrieveCustomer())) {
-   
-         // Then create Customer for current Appointment
-         Customer customer = retrieveCustomer();
-         
-         for (Appointment appointment: appointmentDao.getAllAppointments()) {
-            
-            // if appointment is for this customer
-            if (customerDao.getSingleCustomer(appointment.getCustomerId()).equals(customer)) {
-   
-               // if test Appointment has an earlier start time OR later end time, it's an overlap.
-               if(start.isBefore(appointment.getStartZonedDateTime().toInstant()) ||
-                         end.isBefore(appointment.getEndZonedDateTime().toInstant())) {
-                  return false;
-               }
-            }
-         
-         }
-      }
-      else {      // if the Customer is null or it is not in the list of all Customers.
-         return false;
-      }
-      
-      return true;
-   }
-   
-   
-   private Customer retrieveCustomer() {
-      Customer customer = null;
       try {
-         customer = customerDao.getSingleCustomer(Integer.getInteger(customerIDText.getText()));
          
-      } catch (NumberFormatException numberFormat) {
-         numberFormat.getStackTrace();
-         System.out.println("invalid CustomerID in this AppointmentAlter field!");
+         Instant startPotential = retrieveStartZonedDateTime().toInstant();
+         
+         Instant endPotential = retrieveEndZonedDateTime().toInstant();
+         
+         boolean noOverlappingAppointments = hasNoOverlappingAppointments(startPotential, endPotential);
+         
+         // if false, there is an overlap in time(s) and the commit fails.
+         if (!noOverlappingAppointments) {
+            appointmentOverlapAlert();
+            return;
+         }
+         
+         if (appointment != null) {
+            updateAppointment();
+         }
+         else
+            saveNewAppointment();
+      } catch (Exception e) {
+         nullFieldAlert();
+         e.getStackTrace();
       }
-      
-      return customer;
    }
    
    
@@ -292,8 +253,40 @@ public class AppointmentAlterController implements Initializable {
          }
       });
    }
-
-
+   
+   
+   /**
+    * Method calculates and shows the Appointment End time and is called when user selects an Appointment duration from durationTimeComboBox.
+    * @param event Input ActionEvent comes from FXML application when a time duration is selected from durationTimeComboBox.
+    */
+   @FXML
+   private void calculateEndTime(ActionEvent event) {
+      // method is called when user selects an Appointment duration, when the start time is valid.
+      
+      try {
+         // if (startTime is valid)
+         LocalTime startTime = startTimeComboBox.getValue();
+         System.out.println("got valid startTime " + startTime);
+         
+         // retrieve duration
+         long duration = durationTimeComboBox.getValue();
+         System.out.println("\tand valid duration! " + duration);
+   
+         // calculate the Appointment End by adding the duration to start time
+         LocalTime endTime = startTime.plusMinutes(duration);
+         System.out.println("\t\tendTime: " + endTime);
+   
+         // show Appointment End on Label endTimeLabel
+//         String endTimeAsString = endTime.f "";
+         endTimeLabel.setText(String.valueOf(endTime));
+   
+      } catch (NullPointerException nullPointerException) {
+         setDurationBeforeStartAlert();
+      }
+      
+   }
+   
+   
    /**
     * Method confirms user wishes to delete then deletes the Appointment from database.
     * @param event User button press to delete the appointment.
@@ -321,13 +314,14 @@ public class AppointmentAlterController implements Initializable {
       /**
        * --- LAMBDA EXPRESSION # 3---
        * A lambda expression here ensures that program flows properly while increasing readability.
-       * Additionally, this lambda expression simplifies variable declaration and initialization.
+       * Additionally, this lambda expression does not require a method name and simplifies variable declaration and initialization.
        * Note the presentation difference between lambda expression #1 and #3 caused by handling a potential IOException inline or with a method throw.
        */
       deleteAlert.showAndWait().filter(response -> response == ButtonType.OK).ifPresent(response -> deleteAppointment(appointment));
 
       returnToMainMenu();
    }
+   
    
    /** Method attempts to delete the Appointment from the database then shows user a confirmation message.
     * @param appointment Input Appointment to be deleted.
@@ -345,19 +339,6 @@ public class AppointmentAlterController implements Initializable {
    }
    
    
-   /** Method creates and shows an Alert once an Appointment has been deleted.
-    * @param appointment Input Appointment that has been deleted from the database.
-    */
-   private void confirmDelete(Appointment appointment) {
-      Alert confirmDeleteAlert = new Alert(Alert.AlertType.INFORMATION);
-      confirmDeleteAlert.setTitle("Appointment Deletion Confirmation");
-      confirmDeleteAlert.setHeaderText("This Appointment has been permanently deleted.");
-      confirmDeleteAlert.setContentText("Deleted Appointment info\nAppointment ID: " + appointment.getAppointmentID() +
-                "\nAppointment Type: " + appointment.getType());
-      confirmDeleteAlert.showAndWait();
-   }
-   
-   
    /**
     * Method closes this scene and returns to MainMenuController.
     */
@@ -368,6 +349,7 @@ public class AppointmentAlterController implements Initializable {
       Parent root = loader.load();
       primaryStage.setScene(new Scene(root));
       primaryStage.setResizable(false);
+      primaryStage.setTitle("Consulting App - Main Menu");
 
       primaryStage.show();
    }
@@ -408,18 +390,6 @@ public class AppointmentAlterController implements Initializable {
 
 
    /**
-    * Method will display an Alert to the user that data is invalid if one or more FXML fields are left blank.
-    */
-   private void nullFieldAlert() {
-      Alert saveAlert = new Alert(Alert.AlertType.ERROR);
-      saveAlert.setTitle("Invalid new Appointment");
-      saveAlert.setHeaderText("Fill in all fields.");
-      saveAlert.setContentText("Please try again with all Appointment fields correctly inputted.");
-      saveAlert.showAndWait();
-   }
-
-
-   /**
     * Method updates all fields for the Appointment then sends it to the DaoImpl to be updated in the database.
     */
    private void updateAppointment() throws IOException {
@@ -446,47 +416,118 @@ public class AppointmentAlterController implements Initializable {
 
       returnToMainMenu();
    }
-
-
+   
+   
    /**
-    * Method retrieves LocalDate from the DatePicker and LocalTime from a TextField to create, convert, then
-    *    return a ZonedDateTime Object.
-    * @return Returns the Appointment's start ZonedDateTime, constructed and converted from the FXML input fields.
+    * Method populates all possible Appointment Start times to the ComboBox.
     */
-   private ZonedDateTime retrieveStartZonedDateTime() {
-
-      try {
-         LocalDate localDate = datePicker.getValue();
-         LocalTime localStartTime = LocalTime.parse(startTimeText.getText());
-         LocalDateTime startLDT = localDate.atTime(localStartTime);
-         return TimeUtilities.convertDatabaseDTtoZonedDT(startLDT);
-
-      } catch (DateTimeParseException dtParseException) {
-         invalidFieldInputs.add("Start Date");
+   private void populateAppointmentStartTimes() {
+      
+      // LocalDate (set by user)
+      LocalDate localDate;
+      
+      if (datePicker.getValue() == null) {
+         localDate = LocalDate.now(TimeUtilities.headquartersZoneId);
       }
-
-      return null;
+      else {
+         localDate = datePicker.getValue();
+      }
+      
+      // time interval between each available Appointment Start (in minutes)
+      long appointmentSchedulingInterval = 30;
+      
+      ZoneOffset headquartersOffset = TimeUtilities.headquartersZoneId.getRules().getOffset(TimeUtilities.getBusinessOpenInstant(localDate));
+      ZoneOffset currentLocationOffset = ZoneId.systemDefault().getRules().getOffset(TimeUtilities.getBusinessOpenInstant(localDate));
+      
+      System.out.println("headquartersOffset: " + headquartersOffset);
+      System.out.println("currentLocationOffset: " + currentLocationOffset);
+      int difference = currentLocationOffset.compareTo(headquartersOffset);
+      System.out.println("Difference = " + currentLocationOffset.compareTo(headquartersOffset));
+      
+      LocalTime firstAppointmentStart = LocalTime.of(8,0);
+      System.out.println("firstAppointmentSTart: " + firstAppointmentStart);
+      
+      firstAppointmentStart = firstAppointmentStart.plusSeconds(-difference);
+      System.out.println("LocalTime of 8am adjusted from New_York to current system location is " + firstAppointmentStart);
+      
+      // add beginning of business hours to the startTimeComboBox
+      startTimeComboBox.getItems().add(firstAppointmentStart);
+      // set the default Start time to be the beginning of business hours
+      startTimeComboBox.setValue(firstAppointmentStart);
+      
+      while ((firstAppointmentStart.plusMinutes(appointmentSchedulingInterval)).isBefore(LocalTime.of(22, 0))) {
+         firstAppointmentStart = firstAppointmentStart.plusMinutes(appointmentSchedulingInterval);
+         System.out.println("LocalTime of 8am adjusted from New_York to current system location is " + firstAppointmentStart);
+         startTimeComboBox.getItems().add(firstAppointmentStart);
+      }
+      
    }
-
-
+   
+   
    /**
-    * Method retrieves LocalDate from the DatePicker and LocalTime from a TextField to create, convert, then
-    *    return a ZonedDateTime Object.
-    * @return Returns the Appointment's end ZonedDateTime, constructed and converted from the FXML input fields.
+    * Method populates all options for interval durations to the ComboBox.
     */
-   private ZonedDateTime retrieveEndZonedDateTime() {
-
-         try {
-            LocalDate localDate = datePicker.getValue();
-            LocalTime localEndTime = LocalTime.parse(endTimeText.getText());
-            LocalDateTime endLDT = localDate.atTime(localEndTime);
-            return endLDT.atZone(ZoneId.systemDefault());
-
-         } catch (DateTimeParseException parseException) {
-            invalidFieldInputs.add("End Date");
-            parseException.getStackTrace();
+   private void populateAppointmentDurations() {
+      long durationInterval = 15;
+      long durationOutput = 0;
+      
+      while (durationOutput < 60 - durationInterval) {
+         durationTimeComboBox.getItems().add(durationOutput+=durationInterval);
+      }
+   }
+   
+   
+   /**
+    * Method determines if Customer has an Appointment which overlaps with current Appointment.
+    * @param start Input Instant of potential Appointment's Start time.
+    * @param end Input Instant of potential Appointment's End time.
+    * @return Returns true if Appointment is clear of time conflicts and may be committed. Returns false if Appointment has a time conflict and cannot be saved.
+    */
+   private boolean hasNoOverlappingAppointments(Instant start, Instant end) {
+      
+      // Ensure user-input leads to a valid Customer then the Appointment times.
+      if (retrieveCustomer() != null && customerDao.getAllCustomers().contains(retrieveCustomer())) {
+         
+         // Then create Customer for current Appointment
+         Customer customer = retrieveCustomer();
+         
+         for (Appointment tAppointment: appointmentDao.getAllAppointments()) {
+            
+            // if appointment is for this customer
+            if (customerDao.getSingleCustomer(appointment.getCustomerId()).equals(customer)) {
+               
+               // if tAppointment has an earlier start time OR later end time, it's an overlap.
+               if(start.isBefore(appointment.getStartZonedDateTime().toInstant()) ||
+                         end.isBefore(appointment.getEndZonedDateTime().toInstant())) {
+                  return false;
+               }
+            }
+            
          }
-      return null;
+      }
+      else {      // if the Customer is null or it is not in the list of all Customers.
+         return false;
+      }
+      
+      return true;
+   }
+   
+   
+   /**
+    * Method uses parsed int for customer ID to retrieve the Customer.
+    * @return Returns the Customer matching the customerIDText.
+    */
+   private Customer retrieveCustomer() {
+      Customer customer = null;
+      try {
+         customer = customerDao.getSingleCustomer(Integer.getInteger(customerIDText.getText()));
+         
+      } catch (NumberFormatException numberFormat) {
+         numberFormat.getStackTrace();
+         System.out.println("invalid CustomerID in this AppointmentAlter field!");
+      }
+      
+      return customer;
    }
 
 
@@ -499,7 +540,7 @@ public class AppointmentAlterController implements Initializable {
       populateContactComboBox(contactDao.getAllContacts());
       
       if (appointment == null ) {
-         // If there is no appointment leave the remaining default fields.
+         // If there is no appointment do not edit fields
          return;
       }
       commitAppointmentButton.setText("Save this appointment");
@@ -509,8 +550,6 @@ public class AppointmentAlterController implements Initializable {
       locationText.setText(appointment.getLocation());
       typeText.setText(appointment.getType());
       datePicker.setValue(appointment.getStartZonedDateTime().toLocalDate());
-      startTimeText.setText(appointment.getStartZonedDateTime().format(TimeUtilities.timeFormatterLong));
-      endTimeText.setText(appointment.getEndZonedDateTime().format(TimeUtilities.timeFormatterLong));
       customerIDText.setText(String.valueOf(appointment.getCustomerId()));
       userIDText.setText(String.valueOf(appointment.getUserId()));
       contactComboBox.setValue(contactDao.getSingleContact(appointment.getContactId()).getContactName());
@@ -521,7 +560,6 @@ public class AppointmentAlterController implements Initializable {
     * @param contactList Input ArrayList<Contact> which contains every Contact to populate.
     */
    private void populateContactComboBox(ArrayList<Contact> contactList) {
-      System.out.println("AAC.populateContactComboBox(...)");
       ArrayList<String> allNames = new ArrayList<>();
       
       contactComboBox.getItems().clear();
@@ -542,7 +580,6 @@ public class AppointmentAlterController implements Initializable {
     *    The default population of ComboBox will be every contact from ContactDaoImpl.
     */
    private void populateContactComboBox() {
-      System.out.println("AAC.populateContactComboBox()");
       
       ArrayList<String> allNames = new ArrayList<>();
       
@@ -559,21 +596,69 @@ public class AppointmentAlterController implements Initializable {
    
    
    /**
-    * Method shows an Alert to user with acceptable Appointment start and end times.
+    * Method retrieves LocalDate from the DatePicker and LocalTime from a TextField to create, convert, then
+    *    return a ZonedDateTime Object.
+    * @return Returns the Appointment's start ZonedDateTime, constructed and converted from the FXML input fields.
     */
-   private void invalidDateTimeAlert() {
-      Alert inoperableDateTimeAlert = new Alert(Alert.AlertType.ERROR);
-      ZonedDateTime startZDT = ZonedDateTime.ofInstant(TimeUtilities.businessOpen, ZoneId.systemDefault());
-      ZonedDateTime endZDT = ZonedDateTime.ofInstant(TimeUtilities.businessClosed, ZoneId.systemDefault());
+   private ZonedDateTime retrieveStartZonedDateTime() {
       
-      inoperableDateTimeAlert.setTitle("Invalid Appointment");
-      inoperableDateTimeAlert.setHeaderText("Appointment could not be saved because it is outside business hours.");
-      inoperableDateTimeAlert.setContentText("Adjusted for your time zone, we open at " +
-                     TimeUtilities.timeFormatterLong.format(startZDT) +
-                " and close at " +
-                     TimeUtilities.timeFormatterLong.format(endZDT) + ".");
+      try {
+         LocalDate localDate = datePicker.getValue();
+         System.out.println("aac's retrieveStartZDT... LocalDate: " + localDate);
+         LocalTime localStartTime = LocalTime.parse(startTimeText.getText());
+         LocalDateTime startLDT = localDate.atTime(localStartTime);
+         System.out.println("aac's retrieveStartZDT... LocalDateTime: " + startLDT);
+         ZonedDateTime startZDT = startLDT.atZone(ZoneId.systemDefault());
+         ZonedDateTime adjustedToHQZone = startZDT.withZoneSameInstant(TimeUtilities.headquartersZoneId);
+         return adjustedToHQZone;
+         
+      } catch (DateTimeParseException dtParseException) {
+         
+         try {
+            
+            LocalDate localDate = datePicker.getValue();
+            LocalTime localStartTime = LocalTime.parse(startTimeText.getText());
+            LocalDateTime startLDT = localDate.atTime(localStartTime);
+            System.out.println("aac's retrieveStartZDT... startLDT: " + startLDT);
+            ZonedDateTime startZDT = startLDT.atZone(ZoneId.systemDefault());
+            ZonedDateTime adjustedToHQZone = startZDT.withZoneSameInstant(TimeUtilities.headquartersZoneId);
+            return adjustedToHQZone;
+            
+         } catch (DateTimeParseException dateParseException) {
+            System.out.println("AHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+         }
+         
+         
+         invalidFieldInputs.add("Start Date");
+      } catch (NullPointerException nullException) {
+         MyAlert myAlert = new MyAlert(Alert.AlertType.ERROR);
+         myAlert.invalidSelectionAlert("Date");
+      }
       
-      inoperableDateTimeAlert.showAndWait();
+      return null;
+   }
+   
+   
+   /**
+    * Method retrieves LocalDate from the DatePicker and LocalTime from a TextField to create, convert, then
+    *    return a ZonedDateTime Object.
+    * @return Returns the Appointment's end ZonedDateTime, constructed and converted from the FXML input fields.
+    */
+   private ZonedDateTime retrieveEndZonedDateTime() {
+      
+      try {
+         LocalDate localDate = datePicker.getValue();
+         LocalTime localEndTime = LocalTime.parse(endTimeLabel.getText());
+         LocalDateTime endLDT = localDate.atTime(localEndTime);
+         ZonedDateTime endZDT = endLDT.atZone(TimeUtilities.userZoneId);
+         ZonedDateTime adjustedToHQZone = endZDT.withZoneSameInstant(TimeUtilities.headquartersZoneId);
+         return adjustedToHQZone;
+         
+      } catch (DateTimeParseException parseException) {
+         invalidFieldInputs.add("End Date");
+         parseException.getStackTrace();
+      }
+      return null;
    }
 
 
@@ -629,5 +714,54 @@ public class AppointmentAlterController implements Initializable {
       }
 
       return contactID;
+   }
+   
+   
+   /**
+    * Method creates and shows an Alert telling user to select a Start time before picking a duration.
+    */
+   private void setDurationBeforeStartAlert() {
+      Alert durationBeforeStartAlert = new Alert(Alert.AlertType.ERROR);
+      durationBeforeStartAlert.setTitle("Improper selection");
+      durationBeforeStartAlert.setHeaderText("Pick a Start time before selecting a duration.");
+      durationBeforeStartAlert.setContentText("We're sorry for any inconvenience but an Appointment must have a Start time before the duration can be set.");
+      durationBeforeStartAlert.showAndWait();
+   }
+   
+   
+   /** Method creates and shows an Alert once an Appointment has been deleted.
+    * @param appointment Input Appointment that has been deleted from the database.
+    */
+   private void confirmDelete(Appointment appointment) {
+      Alert confirmDeleteAlert = new Alert(Alert.AlertType.INFORMATION);
+      confirmDeleteAlert.setTitle("Appointment Deletion Confirmation");
+      confirmDeleteAlert.setHeaderText("This Appointment has been permanently deleted.");
+      confirmDeleteAlert.setContentText("Deleted Appointment info\nAppointment ID: " + appointment.getAppointmentID() +
+                "\nAppointment Type: " + appointment.getType());
+      confirmDeleteAlert.showAndWait();
+   }
+   
+   
+   /**
+    * Method will display an Alert to the user that data is invalid if one or more FXML fields are left blank.
+    */
+   private void nullFieldAlert() {
+      Alert saveAlert = new Alert(Alert.AlertType.ERROR);
+      saveAlert.setTitle("Invalid new Appointment");
+      saveAlert.setHeaderText("Fill in all fields.");
+      saveAlert.setContentText("Please try again with all Appointment fields correctly inputted.");
+      saveAlert.showAndWait();
+   }
+   
+   
+   /**
+    * Method creates and shows an Alert to user when there is a time conflict wth an already existing Appointment for the selected Contact.
+    */
+   private void appointmentOverlapAlert() {
+      Alert overlapAlert = new Alert(Alert.AlertType.ERROR);
+      overlapAlert.setTitle("Invalid Appointment Time");
+      overlapAlert.setHeaderText("The selected time conflicts with an existing Appointment for " + retrieveCustomer().getCustomerName() + ".");
+      overlapAlert.setHeaderText("Adjust the time then try saving again.");
+      overlapAlert.showAndWait();
    }
 }
