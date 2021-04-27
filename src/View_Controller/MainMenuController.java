@@ -4,7 +4,6 @@ import Database.DAO.CountryDaoImpl;
 import Database.DAO.FirstLevelDivisionDaoImpl;
 import Database.Entities.Appointment;
 import Utilities.MyAlert;
-import Utilities.TimeUtilities;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -167,7 +166,7 @@ public class MainMenuController implements Initializable {
     */
    @Override
    public void initialize(URL url, ResourceBundle resourceBundle) {
-      populateAppointmentTable();
+      initialPopulateAppointmentTable();
    }
 
    /**
@@ -251,54 +250,78 @@ public class MainMenuController implements Initializable {
 
 
    /**
-    * Method displays relevant data to the TableView by calling limitAppointments(...)
+    * Method displays relevant data to appointmentsTableView, limited by RadioButton by calling limitAppointments(...)
     */
-   private void populateAppointmentTable() {
+   private void initialPopulateAppointmentTable() {
+      
+      // create the factory for each cell's value
+      setCellValueFactories();
 
       ObservableList<Appointment> appointmentObservableList = FXCollections.observableArrayList();
-      if (appointmentsDaoImpl.allAppointments != null) {
-         ArrayList<Appointment> limitedAppointments = null;
-
-         // check if
-         if (weeklyRadioButton.isSelected() ) {
-            limitedAppointments = limitAppointments(ZonedDateTime.now().plusWeeks(1));
-         }
-         else if (monthlyRadioButton.isSelected()) {
-            limitedAppointments = limitAppointments(ZonedDateTime.now().plusMonths(1));
-         }
+      
+      if (appointmentsDaoImpl.getAllAppointments() != null) {
+         
+         ArrayList<Appointment> limitedAppointments = getLimitedAppointments();
          appointmentObservableList.addAll(limitedAppointments);
 
-//         for (Appointment appt: appointmentsDaoImpl.allAppointments) {
-//            appointmentObservableList.add(appt);
-//         }
       }
-      else
-         System.out.println("getAllAppointments() is NULL =( ");
 
-      setCellValueFactories();
       appointmentsTableView.setItems(appointmentObservableList);
-
    }
    
    
    /**
-    * Method uses property value factory on appointmentTableView.
+    * Method will clear then repopulate appointmentsTableView.
     */
-   private void setCellValueFactories() {
+   private void resetAppointmentsTableView() {
+      // create appointmentObservableList and add each relevant Appointment.
+      ObservableList<Appointment> appointmentObservableList = FXCollections.observableArrayList();
+      appointmentObservableList.addAll(getLimitedAppointments());
       
-      columnApptId.setCellValueFactory(new PropertyValueFactory<Appointment,Integer>("AppointmentID"));
-      columnTitle.setCellValueFactory(new PropertyValueFactory<Appointment, String>("Title"));
-      columnDescription.setCellValueFactory(new PropertyValueFactory<Appointment, String>("Description"));
-      columnLocation.setCellValueFactory(new PropertyValueFactory<Appointment, String>("Location"));
-      columnType.setCellValueFactory(new PropertyValueFactory<Appointment, String>("Type"));
-      columnStartDateTime.setCellValueFactory(new PropertyValueFactory<Appointment, ZonedDateTime>("FormattedStartString"));
-      columnEndDateTime.setCellValueFactory(new PropertyValueFactory<Appointment, ZonedDateTime>("FormattedEndString"));
-      columnCustomerID.setCellValueFactory(new PropertyValueFactory<Appointment,Integer>("CustomerId"));
-      columnContactID.setCellValueFactory(new PropertyValueFactory<>("ContactId"));
-      columnUserId.setCellValueFactory(new PropertyValueFactory<>("userId"));
+      // remove current items
+      appointmentsTableView.getItems().clear();
+      // add all new items
+      appointmentsTableView.getItems().addAll(appointmentObservableList);
+      
    }
    
-
+   
+   /**
+    * Method retrieves the latest acceptable ZonedDateTime for an Appointment to be shown,
+    * @return Returns an ArrayList<Appointment> of every Appointment that meets the currently selected criteria.
+    */
+   private ArrayList<Appointment> getLimitedAppointments() {
+      ArrayList<Appointment> appointments = new ArrayList<>();
+      
+      ZonedDateTime tableViewEnd = getTableViewEnd();
+      
+      appointments = limitAppointments(tableViewEnd);
+      
+      return appointments;
+   }
+   
+   
+   /**
+    * Method detects which RadioButton is selected then adds the relevant time from now to specify which Appointment(s) to populate.
+    * @return
+    */
+   private ZonedDateTime getTableViewEnd() {
+      
+      ZonedDateTime end = null;
+   
+      // check if weekly is selected
+      if (weeklyRadioButton.isSelected() ) {
+         end = (ZonedDateTime.now().plusWeeks(1));
+      }
+      // ELSE the monthlyRadioButton must be selected.
+      else {
+         end = (ZonedDateTime.now().plusMonths(1));
+      }
+      
+      return end;
+   }
+   
+   
    /**
     * Method receives a ZonedDateTime and returns scheduled Appointments between current time and then
     * @param zdt ZonedDateTime input used to limit every Appointment
@@ -307,13 +330,55 @@ public class MainMenuController implements Initializable {
    private ArrayList<Appointment> limitAppointments(ZonedDateTime zdt) {
       ArrayList<Appointment> limitedAppointments = new ArrayList<>();
       for (Appointment appt: appointmentsDaoImpl.getAllAppointments()) {
-
+         
          // if the Appointment's start is after now and before the input ZonedDateTime
          if (ZonedDateTime.now().isBefore(appt.getStartZonedDateTime()) && appt.getStartZonedDateTime().isBefore(zdt))
             limitedAppointments.add(appt);
       }
-
+      
       return limitedAppointments;
+   }
+   
+   
+   /**
+    * Method is called by user's action on UI - method will call for appointmentsTableView to be adjusted, if appropriate.
+    * @param event Input ActionEvent caused by user's select on UI.
+    */
+   @FXML
+   private void weeklyRadioButtonSelected(ActionEvent event) {
+      
+      System.out.println("MMC is resetting appointmentsTableView - view by WEEK");
+      resetAppointmentsTableView();
+   }
+   
+   
+   /**
+    * Method is called by user's action on UI - method will call for appointmentsTableView to be adjusted, if appropriate.
+    * @param event Input ActionEvent caused by user's select on UI.
+    */
+   @FXML
+   private void monthlyRadioButtonSelected(ActionEvent event) {
+   
+      System.out.println("MMC is resetting appointmentsTableView - view by MONTH");
+      resetAppointmentsTableView();
+   }
+   
+   
+   /**
+    * Method uses property value factory on appointmentTableView.
+    */
+   private void setCellValueFactories() {
+      
+      columnApptId.setCellValueFactory(new PropertyValueFactory<>("AppointmentID"));
+      columnTitle.setCellValueFactory(new PropertyValueFactory<>("Title"));
+      columnDescription.setCellValueFactory(new PropertyValueFactory<>("Description"));
+      columnLocation.setCellValueFactory(new PropertyValueFactory<>("Location"));
+      columnType.setCellValueFactory(new PropertyValueFactory<>("Type"));
+      columnStartDateTime.setCellValueFactory(new PropertyValueFactory<>("FormattedStartString"));
+      columnEndDateTime.setCellValueFactory(new PropertyValueFactory<>("FormattedEndString"));
+      columnCustomerID.setCellValueFactory(new PropertyValueFactory<>("CustomerId"));
+      columnContactID.setCellValueFactory(new PropertyValueFactory<>("ContactId"));
+      columnUserId.setCellValueFactory(new PropertyValueFactory<>("userId"));
    }
 
 
@@ -460,6 +525,7 @@ public class MainMenuController implements Initializable {
       }
       
       // create a temporary copy of the ArrayList containing every Type, so we do not show duplicates.
+      @SuppressWarnings("unchecked")
       ArrayList<String> typeListClone = (ArrayList<String>) typeList.clone();
       System.out.println("typeListClone original size is same as typeList at " + typeListClone.size() + " elements.");
       
@@ -476,6 +542,7 @@ public class MainMenuController implements Initializable {
          }
          
          // creating ANOTHER temp clone...
+         @SuppressWarnings("unchecked")
          ArrayList<String> typeRemovingDuplicates = (ArrayList<String>) typeListClone.clone();
          // remove all elements matching the current String.
          while (typeRemovingDuplicates.contains(currentType)) {
