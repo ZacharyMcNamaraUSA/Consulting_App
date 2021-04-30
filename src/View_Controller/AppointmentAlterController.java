@@ -143,8 +143,6 @@ public class AppointmentAlterController implements Initializable {
    private AppointmentDaoImpl appointmentDao = new AppointmentDaoImpl();
    private ContactDaoImpl contactDao = new ContactDaoImpl();
    private CustomerDaoImpl customerDao = new CustomerDaoImpl();
-   private final int VALID = 10;
-   private final int INVALID = -10;
    
    
    /**
@@ -164,7 +162,6 @@ public class AppointmentAlterController implements Initializable {
    public void initialize(URL url, ResourceBundle resourceBundle) {
       
       populateContactComboBox();
-   
    }
 
 
@@ -190,6 +187,7 @@ public class AppointmentAlterController implements Initializable {
    /**
     * Method retrieves data for the current Appointment then calls the correct database update.
     * @param event ActionEvent input from user's button press to commit this Appointment.
+    * @throws IOException Throws IOException ot track if an error occurs during data I/O.
     */
    @FXML
    private void commitAppointment(ActionEvent event) throws IOException {
@@ -202,19 +200,28 @@ public class AppointmentAlterController implements Initializable {
          
          boolean noOverlappingAppointments = hasNoOverlappingAppointments(startPotential, endPotential);
          
-         // if false, there is an overlap in time(s) and the commit fails.
+         // if false, there is an overlap in Appointment times, by Customer, the commit fails.
          if (!noOverlappingAppointments) {
+            
             appointmentOverlapAlert();
+            
             return;
          }
          
          if (appointment != null) {
             updateAppointment();
+            System.out.println("This is an existing Appointment I am trying to UPDATE in AppointmentAlterController.commitAppointment(..)");
          }
-         else
+         else {
             saveNewAppointment();
-      } catch (Exception e) {
+            System.out.println("This is a new Appointment I am trying to save in AppointmentAlterController.commitAppointment(..)");
+         }
+      } catch (NullPointerException nullPointerException) {
+         System.out.println("some field is causing NullPointerException @ AppointmentAlterController.commitAppointment");
          nullFieldAlert();
+         System.out.println(nullPointerException.getMessage() + " @ AppointmentAlterController.commitAppointment");
+         
+      } catch (Exception e) {
          e.getStackTrace();
       }
    }
@@ -223,7 +230,11 @@ public class AppointmentAlterController implements Initializable {
    /**
     * Method is called when user activates the 'Cancel' button.
     * @param event Input ActionEvent is caused by user activating the 'Cancel' button.
-    * @throws IOException
+    * @throws IOException Throws IOException ot track if an error occurs during data I/O.
+   
+    * --- LAMBDA EXPRESSION #1 ---
+    * A lambda expression here ensures that program flows properly while increasing readability.
+    * Additionally, this lambda expression simplifies variable declaration and initialization.
     */
    @FXML
    private void cancelAppointmentAlter(ActionEvent event) {
@@ -236,12 +247,6 @@ public class AppointmentAlterController implements Initializable {
       ButtonType okayButton = new ButtonType("YES");
       ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
       confirmCancelAlert.getButtonTypes().setAll(okayButton, cancelButton);
-   
-      /**
-       * --- LAMBDA EXPRESSION #1 ---
-       * A lambda expression here ensures that program flows properly while increasing readability.
-       * Additionally, this lambda expression simplifies variable declaration and initialization.
-       */
       confirmCancelAlert.showAndWait().ifPresent(response -> {
          if (response == okayButton) {
             try {
@@ -256,68 +261,98 @@ public class AppointmentAlterController implements Initializable {
    
    
    /**
-    * Method calculates and shows the Appointment End time and is called when user selects an Appointment duration from durationTimeComboBox.
+    * Method initiates an Appointment end time to be calculated and is called when user selects from from durationTimeComboBox.
     * @param event Input ActionEvent comes from FXML application when a time duration is selected from durationTimeComboBox.
     */
    @FXML
-   private void calculateEndTime(ActionEvent event) {
-      // method is called when user selects an Appointment duration, when the start time is valid.
+   private void userSelectedDuration(ActionEvent event) {
+      // method is called when user selects an Appointment duration from the FXML Scene
       
+      calculateEndTime();
+      
+   }
+   
+   
+   /**
+    * Method will initiate Appointment end time calculations but only if a duration has already been selected.
+    * @param event Input ActionEvent comes from FXML application when a time duration is selected from durationTimeComboBox.
+    */
+   @FXML
+   private void userSelectedTime(ActionEvent event) {
+      // method is called when user selects an Appointment time from the FXML Scene
+      
+      if (durationTimeComboBox.getValue() == null) {
+//         System.out.println("NULL duration value is NULL.");
+         return;
+      }
+      
+      calculateEndTime();
+   }
+   
+   
+   /**
+    * Method calculates and sets the Appointment End time. Method is called when user selects an Appointment start time or duration.
+    */
+   private void calculateEndTime() {
+   
       try {
          // if (startTime is valid)
          LocalTime startTime = startTimeComboBox.getValue();
-         System.out.println("got valid startTime " + startTime);
-         
+      
          // retrieve duration
          long duration = durationTimeComboBox.getValue();
-         System.out.println("\tand valid duration! " + duration);
-   
+      
          // calculate the Appointment End by adding the duration to start time
          LocalTime endTime = startTime.plusMinutes(duration);
-         System.out.println("\t\tendTime: " + endTime);
-   
+      
          // show Appointment End on Label endTimeLabel
 //         String endTimeAsString = endTime.f "";
          endTimeLabel.setText(String.valueOf(endTime));
-   
+      
       } catch (NullPointerException nullPointerException) {
          setDurationBeforeStartAlert();
+         
+      } catch (Exception e) {
+         e.getStackTrace();
       }
-      
    }
    
    
    /**
     * Method confirms user wishes to delete then deletes the Appointment from database.
     * @param event User button press to delete the appointment.
+    * @throws IOException Throws IOException ot track if an error occurs during data I/O.
+    *
+    * --- LAMBDA EXPRESSION # 3---
+    * A lambda expression here ensures that program flows properly while increasing readability.
+    * Additionally, this lambda expression does not require a method name and simplifies variable declaration and initialization.
+    * Note the presentation difference between lambda expression #1 and #3 caused by handling a potential IOException inline or with a method throw.
     */
    @FXML
    private void initiateDelete(ActionEvent event) throws IOException {
-      System.out.println("DELETE APPOINTMENT");
+//      System.out.println("DELETE APPOINTMENT");
 
       if (appointment == null ) {
          // no AppointmentID means there is no appointment to be deleted.
          Alert noAppointmentDelete = new Alert(Alert.AlertType.CONFIRMATION);
          noAppointmentDelete.setTitle("Try again");
-         noAppointmentDelete.setContentText("You cannot delete an unsaved appointment!");
-         noAppointmentDelete.setContentText("Did you mean to Cancel this new appointment?");
+         noAppointmentDelete.setHeaderText("You cannot delete an unsaved appointment!");
+         noAppointmentDelete.setContentText("Try to Cancel a new Appointment instead.");
          noAppointmentDelete.showAndWait().ifPresent(response -> {
-            System.out.println(Alert.AlertType.CONFIRMATION.values());
+            // do nothing;
          });
          return;
       }
+      else {
+         Alert deleteAlert = new Alert(Alert.AlertType.CONFIRMATION);
+         deleteAlert.setTitle("Delete warning!");
+         deleteAlert.setHeaderText("Warning! All deletes are final!");
+         deleteAlert.setContentText("Are you sure you wish to delete this object? This delete cannot be reversed!");
+   
+         deleteAlert.showAndWait().filter(response -> response == ButtonType.OK).ifPresent(response -> deleteAppointment(appointment));
+   
+      }
 
-      Alert deleteAlert = new Alert(Alert.AlertType.CONFIRMATION);
-      deleteAlert.setTitle("Delete warning!");
-      deleteAlert.setHeaderText("Warning! All deletes are final!");
-      deleteAlert.setContentText("Are you sure you wish to delete this object? This delete cannot be reversed!");
-      /**
-       * --- LAMBDA EXPRESSION # 3---
-       * A lambda expression here ensures that program flows properly while increasing readability.
-       * Additionally, this lambda expression does not require a method name and simplifies variable declaration and initialization.
-       * Note the presentation difference between lambda expression #1 and #3 caused by handling a potential IOException inline or with a method throw.
-       */
-      deleteAlert.showAndWait().filter(response -> response == ButtonType.OK).ifPresent(response -> deleteAppointment(appointment));
 
       returnToMainMenu();
    }
@@ -335,23 +370,31 @@ public class AppointmentAlterController implements Initializable {
          e.getStackTrace();
       }
       
-      confirmDelete(appointment);
+      confirmDeleteAlert(appointment);
    }
    
    
    /**
     * Method closes this scene and returns to MainMenuController.
+    * @throws IOException Throws IOException ot track if an error occurs during data I/O.
     */
    private void returnToMainMenu() throws IOException {
-      Stage primaryStage = Main.myStage;
-
-      FXMLLoader loader = new FXMLLoader(getClass().getResource("/View_Controller/MainMenu.fxml"));
-      Parent root = loader.load();
-      primaryStage.setScene(new Scene(root));
-      primaryStage.setResizable(false);
-      primaryStage.setTitle("Consulting App - Main Menu");
-
-      primaryStage.show();
+      try {
+   
+         Stage primaryStage = Main.myStage;
+   
+         FXMLLoader loader = new FXMLLoader(getClass().getResource("/View_Controller/MainMenu.fxml"));
+         Parent root = loader.load();
+         primaryStage.setScene(new Scene(root));
+         primaryStage.setResizable(false);
+         primaryStage.setTitle("Consulting App - Main Menu");
+   
+         primaryStage.show();
+      } catch (IOException ioException) {
+         ioException.getStackTrace();
+      } catch (Exception e) {
+         e.getStackTrace();
+      }
    }
 
 
@@ -361,17 +404,17 @@ public class AppointmentAlterController implements Initializable {
    private void saveNewAppointment() {
       try {
          AppointmentDaoImpl.addAppointmentToDatabase(
-                    titleText.getText(),
-                    descriptionText.getText(),
-                    locationText.getText(),
-                    typeText.getText(),
+                    retrieveTitleText(),
+                    retrieveDescription(),
+                    retrieveLocation(),
+                    retrieveType(),
                     retrieveStartZonedDateTime(),
                     retrieveEndZonedDateTime(),
                     ZonedDateTime.now(),
                     MainMenuController.activeUser.getUserName(),
                     retrieveCustomerID(),
                     retrieveUserID(),
-                    retrieveContactID()
+                    retrieveContact().getContactId()
          );
 
          returnToMainMenu();
@@ -391,6 +434,7 @@ public class AppointmentAlterController implements Initializable {
 
    /**
     * Method updates all fields for the Appointment then sends it to the DaoImpl to be updated in the database.
+    * @throws IOException Throws IOException ot track if an error occurs during data I/O.
     */
    private void updateAppointment() throws IOException {
       
@@ -406,7 +450,7 @@ public class AppointmentAlterController implements Initializable {
          appointment.setLastUpdatedBy(MainMenuController.activeUser.getUserName());
          appointment.setCustomerId(retrieveCustomerID());
          appointment.setUserId(retrieveUserID());
-         appointment.setContactId(retrieveContactID());
+         appointment.setContactId(retrieveContact().getContactId());
          
          appointmentDao.updateAppointment(appointment);
          
@@ -438,17 +482,17 @@ public class AppointmentAlterController implements Initializable {
       
       ZoneOffset headquartersOffset = TimeUtilities.headquartersZoneId.getRules().getOffset(TimeUtilities.getBusinessOpenInstant(localDate));
       ZoneOffset currentLocationOffset = ZoneId.systemDefault().getRules().getOffset(TimeUtilities.getBusinessOpenInstant(localDate));
-      
-      System.out.println("headquartersOffset: " + headquartersOffset);
-      System.out.println("currentLocationOffset: " + currentLocationOffset);
+//
+//      System.out.println("headquartersOffset: " + headquartersOffset);
+//      System.out.println("currentLocationOffset: " + currentLocationOffset);
       int difference = currentLocationOffset.compareTo(headquartersOffset);
-      System.out.println("Difference = " + currentLocationOffset.compareTo(headquartersOffset));
+//      System.out.println("Difference = " + difference);
       
       LocalTime firstAppointmentStart = LocalTime.of(8,0);
-      System.out.println("firstAppointmentSTart: " + firstAppointmentStart);
+//      System.out.println("firstAppointmentSTart: " + firstAppointmentStart);
       
       firstAppointmentStart = firstAppointmentStart.plusSeconds(-difference);
-      System.out.println("LocalTime of 8am adjusted from New_York to current system location is " + firstAppointmentStart);
+//      System.out.println("LocalTime of 8am adjusted from New_York to current system location is " + firstAppointmentStart);
       
       // add beginning of business hours to the startTimeComboBox
       startTimeComboBox.getItems().add(firstAppointmentStart);
@@ -456,8 +500,11 @@ public class AppointmentAlterController implements Initializable {
       startTimeComboBox.setValue(firstAppointmentStart);
       
       while ((firstAppointmentStart.plusMinutes(appointmentSchedulingInterval)).isBefore(LocalTime.of(22, 0))) {
+         
          firstAppointmentStart = firstAppointmentStart.plusMinutes(appointmentSchedulingInterval);
-         System.out.println("LocalTime of 8am adjusted from New_York to current system location is " + firstAppointmentStart);
+         
+//         System.out.println("LocalTime of 8am adjusted from New_York to current system location is " + firstAppointmentStart);
+         
          startTimeComboBox.getItems().add(firstAppointmentStart);
       }
       
@@ -479,55 +526,67 @@ public class AppointmentAlterController implements Initializable {
    
    /**
     * Method determines if Customer has an Appointment which overlaps with current Appointment.
-    * @param start Input Instant of potential Appointment's Start time.
-    * @param end Input Instant of potential Appointment's End time.
+    * @param startPotential Input Instant of potential Appointment's Start time.
+    * @param endPotential Input Instant of potential Appointment's End time.
     * @return Returns true if Appointment is clear of time conflicts and may be committed. Returns false if Appointment has a time conflict and cannot be saved.
     */
-   private boolean hasNoOverlappingAppointments(Instant start, Instant end) {
+   private boolean hasNoOverlappingAppointments(Instant startPotential, Instant endPotential) {
+   
+      // Retrieve Customer
+      Customer customer = retrieveCustomer();
       
-      // Ensure user-input leads to a valid Customer then the Appointment times.
-      if (retrieveCustomer() != null && customerDao.getAllCustomers().contains(retrieveCustomer())) {
+      Instant scheduledStart;
+      Instant scheduledEnd;
+   
+      // loop through every Appointment
+      for (Appointment tAppointment: appointmentDao.getAllAppointments()) {
          
-         // Then create Customer for current Appointment
-         Customer customer = retrieveCustomer();
-         
-         for (Appointment tAppointment: appointmentDao.getAllAppointments()) {
+         // skip checks for the current/same Appointment.
+         if (tAppointment.getAppointmentID() == Integer.valueOf(appointmentIDText.getText())) {
+            continue;
+   
+         }
+   
+         scheduledStart = tAppointment.getStartZonedDateTime().toInstant();
+         scheduledEnd = tAppointment.getEndZonedDateTime().toInstant();
+   
+   
+         // if appointment is for this customer, check for time overlap.
+         if (customerDao.getSingleCustomer(tAppointment.getCustomerId()).equals(customer)) {
+//            System.out.println("Customer has another appointment. ID = " + tAppointment.getAppointmentID());
             
-            // if appointment is for this customer
-            if (customerDao.getSingleCustomer(appointment.getCustomerId()).equals(customer)) {
-               
-               // if tAppointment has an earlier start time OR later end time, it's an overlap.
-               if(start.isBefore(appointment.getStartZonedDateTime().toInstant()) ||
-                         end.isBefore(appointment.getEndZonedDateTime().toInstant())) {
-                  return false;
-               }
+            // compare the start time's of scheduled appointment 'tAppointment' with the start time for commit-attempt-Appointment 'start'...
+            
+            if (startPotential.equals(scheduledStart) || endPotential.equals(scheduledEnd)) {
+               // IF startPotential and scheduledStart are the same, there will always be overlap. same for endings too. return false.
+               System.out.println("Appointment start/end are the same as ones already scheduled!");
+               return false;
             }
             
+            // IF startPotential earlier is earlier or same time as scheduledStart
+            if (startPotential.isBefore(scheduledStart)) {
+               
+               // IF end is between scheduledStart and scheduleEnd - conflict
+               if (endPotential.isAfter(scheduledStart) && endPotential.isBefore(scheduledEnd)) {
+                  System.out.println("returning false cause start is before scheduled start OR equal, AND IF endPotent is after scheduledStart && endPot before ScheduleEnd");
+                  return false;        // yellow case
+               }
+               
+            }
+            // ELSE IF startPotential is between scheduledStart and scheduledEnd - conflict
+            else if (startPotential.isAfter(scheduledStart) && startPotential.isBefore(scheduledEnd)){
+               System.out.println("If you start in the middle of another appointment, you have to be in the middle of it. bad!");
+                  return false;        // blue and orange case
+               
+            }
+            
+            
          }
+         
       }
-      else {      // if the Customer is null or it is not in the list of all Customers.
-         return false;
-      }
+      
       
       return true;
-   }
-   
-   
-   /**
-    * Method uses parsed int for customer ID to retrieve the Customer.
-    * @return Returns the Customer matching the customerIDText.
-    */
-   private Customer retrieveCustomer() {
-      Customer customer = null;
-      try {
-         customer = customerDao.getSingleCustomer(Integer.getInteger(customerIDText.getText()));
-         
-      } catch (NumberFormatException numberFormat) {
-         numberFormat.getStackTrace();
-         System.out.println("invalid CustomerID in this AppointmentAlter field!");
-      }
-      
-      return customer;
    }
 
 
@@ -550,9 +609,14 @@ public class AppointmentAlterController implements Initializable {
       locationText.setText(appointment.getLocation());
       typeText.setText(appointment.getType());
       datePicker.setValue(appointment.getStartZonedDateTime().toLocalDate());
+      startTimeComboBox.setValue(appointment.getStartZonedDateTime().toLocalTime());
+      Duration duration = Duration.between(appointment.getStartZonedDateTime(), appointment.getEndZonedDateTime());
+      if (durationTimeComboBox.getItems().contains(duration.toMinutes())) {
+         durationTimeComboBox.setValue(duration.toMinutes());
+      }
       customerIDText.setText(String.valueOf(appointment.getCustomerId()));
-      userIDText.setText(String.valueOf(appointment.getUserId()));
       contactComboBox.setValue(contactDao.getSingleContact(appointment.getContactId()).getContactName());
+      userIDText.setText(String.valueOf(appointment.getUserId()));
    }
    
    
@@ -581,17 +645,70 @@ public class AppointmentAlterController implements Initializable {
     */
    private void populateContactComboBox() {
       
-      ArrayList<String> allNames = new ArrayList<>();
+      populateContactComboBox(contactDao.getAllContacts());
+   }
+   
+   
+   private String retrieveTitleText() {
+      String title = "";
       
-      contactComboBox.getItems().clear();
-      
-      for (Contact contact: contactDao.getAllContacts()) {
-         allNames.add(contact.getContactName());
+      try {
+         title = titleText.getText();
+         
+      } catch (Exception e) {
+         System.out.println("Invalid titleText in Appt-Alter-Controller");
+         invalidFieldInputs.add("title");
       }
       
-      allNames.sort(String::compareToIgnoreCase);
+      return title;
+   }
+   
+   
+   private String retrieveDescription() {
+      String description = "";
       
-      contactComboBox.getItems().addAll(allNames);
+      try {
+         description = descriptionText.getText();
+         
+      } catch (Exception e) {
+         System.out.println("Invalid descriptionText in Appt-Alter-Controller");
+         invalidFieldInputs.add("description");
+      }
+      
+      return description;
+      
+   }
+   
+   
+   private String retrieveLocation() {
+      String location = "";
+      
+      try {
+         location = locationText.getText();
+         
+      } catch (Exception e) {
+         System.out.println("Invalid locationText in Appt-Alter-Controller");
+         invalidFieldInputs.add("location");
+      }
+      
+      return location;
+      
+   }
+   
+   
+   private String retrieveType() {
+      String type = "";
+      
+      try {
+         type = typeText.getText();
+         
+      } catch (Exception e) {
+         System.out.println("Invalid typeText in Appt-Alter-Controller");
+         invalidFieldInputs.add("type");
+      }
+      
+      return type;
+      
    }
    
    
@@ -604,10 +721,11 @@ public class AppointmentAlterController implements Initializable {
       
       try {
          LocalDate localDate = datePicker.getValue();
-         System.out.println("aac's retrieveStartZDT... LocalDate: " + localDate);
-         LocalTime localStartTime = LocalTime.parse(startTimeText.getText());
+//         System.out.println("aac's retrieveStartZDT... LocalDate: " + localDate);
+         
+         LocalTime localStartTime = startTimeComboBox.getValue();
          LocalDateTime startLDT = localDate.atTime(localStartTime);
-         System.out.println("aac's retrieveStartZDT... LocalDateTime: " + startLDT);
+//         System.out.println("aac's retrieveStartZDT... LocalDateTime: " + startLDT);
          ZonedDateTime startZDT = startLDT.atZone(ZoneId.systemDefault());
          ZonedDateTime adjustedToHQZone = startZDT.withZoneSameInstant(TimeUtilities.headquartersZoneId);
          return adjustedToHQZone;
@@ -626,13 +744,14 @@ public class AppointmentAlterController implements Initializable {
             
          } catch (DateTimeParseException dateParseException) {
             System.out.println("AHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+            invalidFieldInputs.add("Start Date");
          }
          
          
-         invalidFieldInputs.add("Start Date");
       } catch (NullPointerException nullException) {
          MyAlert myAlert = new MyAlert(Alert.AlertType.ERROR);
          myAlert.invalidSelectionAlert("Date");
+         invalidFieldInputs.add("Start Date");
       }
       
       return null;
@@ -671,13 +790,31 @@ public class AppointmentAlterController implements Initializable {
       try {
          customerID = Integer.parseInt(customerIDText.getText());
 
-      } catch (NumberFormatException numberFormatException) {
-         invalidFieldInputs.add("Customer ID");
-      } catch (NullPointerException nullPointerException) {
-         invalidFieldInputs.add("Customer ID");
+      } catch (NumberFormatException | NullPointerException numberFormatException) {
+         invalidFieldInputs.add("Customer ID int");
+      } catch (Exception e) {
+         invalidFieldInputs.add("Customer ID int");
+         e.getStackTrace();
       }
       
       return customerID;
+   }
+   
+   
+   /** Method parses String to an int to be returned.
+    * @return Returns an int for the ContactID.
+    */
+   private Contact retrieveContact() {
+      Contact contact = null;
+      
+      try {
+         contact = contactDao.getSingleContact(contactComboBox.getValue());
+         
+      } catch (NullPointerException nullException) {
+         invalidFieldInputs.add("Contact Name");
+      }
+      
+      return contact;
    }
 
 
@@ -689,31 +826,35 @@ public class AppointmentAlterController implements Initializable {
       try {
          userID = Integer.parseInt(userIDText.getText());
 
-      } catch (NumberFormatException numberFormatException) {
-         invalidFieldInputs.add("User ID");
-      } catch (NullPointerException nullPointerException) {
+      } catch (Exception numberFormatException) {
          invalidFieldInputs.add("User ID");
       }
-
+   
       return userID;
    }
    
    
-   /** Method parses String to an int to be returned.
-    * @return Returns an int for the ContactID.
+   /**
+    * Method uses parsed int for customer ID to retrieve the Customer.
+    * @return Returns the Customer matching the customerIDText.
     */
-   private int retrieveContactID() {
-      int contactID = 0;
-
+   private Customer retrieveCustomer() {
+      Customer customer = null;
       try {
-         Contact contact = contactDao.getSingleContact(contactComboBox.getValue());
-         contactID = contact.getContactId();
-
-      } catch (NullPointerException nullException) {
-         invalidFieldInputs.add("Contact Name");
+         customer = customerDao.getSingleCustomer(retrieveCustomerID());
+         
+      } catch (NullPointerException nullException ) {
+         nullException.getStackTrace();
+         System.out.println("NULL Customer @ AAC.retrieveCustomer");
+         invalidFieldInputs.add("Customer");
+   
+      }catch (Exception e) {
+         e.getStackTrace();
+         System.out.println("Generic Exception in AppointmentAlterController.retrieveCustomer!");
+         invalidFieldInputs.add("Customer");
       }
-
-      return contactID;
+      
+      return customer;
    }
    
    
@@ -732,7 +873,7 @@ public class AppointmentAlterController implements Initializable {
    /** Method creates and shows an Alert once an Appointment has been deleted.
     * @param appointment Input Appointment that has been deleted from the database.
     */
-   private void confirmDelete(Appointment appointment) {
+   private void confirmDeleteAlert(Appointment appointment) {
       Alert confirmDeleteAlert = new Alert(Alert.AlertType.INFORMATION);
       confirmDeleteAlert.setTitle("Appointment Deletion Confirmation");
       confirmDeleteAlert.setHeaderText("This Appointment has been permanently deleted.");
@@ -748,8 +889,15 @@ public class AppointmentAlterController implements Initializable {
    private void nullFieldAlert() {
       Alert saveAlert = new Alert(Alert.AlertType.ERROR);
       saveAlert.setTitle("Invalid new Appointment");
-      saveAlert.setHeaderText("Fill in all fields.");
-      saveAlert.setContentText("Please try again with all Appointment fields correctly inputted.");
+      saveAlert.setHeaderText("Fill in all fields. The fields listed below are wrong...?");
+      String content = "";
+      
+      for (var invalidField: invalidFieldInputs) {
+         content += invalidField + "\n";
+         System.out.println("\tinvalidField: " + invalidField);
+      }
+      
+      saveAlert.setContentText(content);
       saveAlert.showAndWait();
    }
    
@@ -761,7 +909,7 @@ public class AppointmentAlterController implements Initializable {
       Alert overlapAlert = new Alert(Alert.AlertType.ERROR);
       overlapAlert.setTitle("Invalid Appointment Time");
       overlapAlert.setHeaderText("The selected time conflicts with an existing Appointment for " + retrieveCustomer().getCustomerName() + ".");
-      overlapAlert.setHeaderText("Adjust the time then try saving again.");
+      overlapAlert.setContentText("Adjust the time then try saving again.");
       overlapAlert.showAndWait();
    }
 }
