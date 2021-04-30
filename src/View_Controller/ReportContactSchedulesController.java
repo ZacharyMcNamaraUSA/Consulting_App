@@ -124,6 +124,7 @@ public class ReportContactSchedulesController implements Initializable {
      
      private Database.DAO.ContactDaoImpl contactDao = new ContactDaoImpl();
      private Database.Entities.Contact selectedContact = null;
+     private Database.DAO.AppointmentDaoImpl appointmentDao = new AppointmentDaoImpl();
      
      
      /**
@@ -211,14 +212,12 @@ public class ReportContactSchedulesController implements Initializable {
           // ObservableList to be new items in appointmentTableView
           ObservableList<Appointment> appointmentObservableList = FXCollections.observableArrayList();
           
-          // add items to appointmentObservableList...
-          Database.DAO.AppointmentDaoImpl appointmentDao = new AppointmentDaoImpl();
           // for each Appointment, check to see if the Contact matches user-selected Contact
           for (Database.Entities.Appointment appointment: appointmentDao.getAllAppointments()) {
-               if (selectedContact != null && appointment.getContactId() != selectedContact.getContactId()) {
-                    // if this Appointment is linked with a non-null selectedContact, add this appointment
+               if (contact != null && appointment.getContactId() == contact.getContactId()) {
+                    
+                    // if this Appointment has the same ContactId as input Contact 'contact', then add this appointment
                     appointmentObservableList.add(appointment);
-                    System.out.println("Report_Contact's popAppt to TableView is adding... Appointment ID = " + appointment.getAppointmentID());
                }
           }
           
