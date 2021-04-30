@@ -303,7 +303,7 @@ public class MainMenuController implements Initializable {
    
    /**
     * Method detects which RadioButton is selected then adds the relevant time from now to specify which Appointment(s) to populate.
-    * @return
+    * @return Returns the appropriate ZonedDateTime to be the furthest acceptable Appointment start from runtime.
     */
    private ZonedDateTime getTableViewEnd() {
       
@@ -412,8 +412,8 @@ public class MainMenuController implements Initializable {
 
    /**
     * Method populates the selected Appointment to the
-    * @param actionEvent
-    * @throws IOException
+    * @param actionEvent Input actionEvent is send by FXML Application.
+    * @throws IOException Throws IOException, as required, if this occurs during loading.
     */
    public void editSelectedAppointment(ActionEvent actionEvent) throws IOException {
       Stage primaryStage = Main.myStage;
